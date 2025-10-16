@@ -14,10 +14,10 @@ export const metadata: Metadata = {
     default: 'Diane Developer Portfolio',
     template: '%s | Diane Developer Portfolio',
   },
-  description: 'Developer portfolio and blog by Diane Stephani.',
+  description: 'Developer portfolio and projects by Diane Stephani.',
   openGraph: {
     title: 'Diane Developer Portfolio',
-    description: 'Developer portfolio and blog by Diane Stephani.',
+    description: 'Developer portfolio and projects by Diane Stephani.',
     url: baseUrl,
     siteName: 'Diane Developer Portfolio',
     locale: 'en_US',
