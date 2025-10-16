@@ -1,22 +1,23 @@
 ---
 title: 'Seattle Fitness Week 2025 - Inaugural'
 publishedAt: '2025-03-25'
-summary: 'A technical solution that TKTKTKTK'
+summary: 'A technical solution that successfully enabled bookings for the inaugural Seattle Fitness Week.'
 ---
 
-**Live Demo:** [Link] | **GitHub:** [Link]
+## **The Event**
+Seattle Fitness Week was an event designed to make new fitness spaces more accessible for the Seattle community. Users purchased a ticket for $49, and for 2 weeks they were able to book fitness classes at participating gyms and studios. Class bookings were hosted by [**Gymki**](https://www.gymki.com/), an application that allows users to explore nearby gyms and book classes or open gym times.
+<br />
 
 ## **The Problem**
-A short 1–2 sentence description of what the project does. Focus on the main purpose and functionality.
+The problem we ran into was connecting the financial side of ticket sales with the booking side of Gymki. Seattle Fitness Week wanted to handle all transactions for ticket sales, but we needed a way to authenticate purchasers on Gymki so they could book classes. Gymki had a database of 5000 user codes, and a unique code needed to be given to everyone who purchased a ticket for the event.
+<br />
 
 ## **My Solution**
-Briefly explain the core technologies, frameworks, or tools you used and how the project functions. You can also mention any clever technical solutions or interesting features.
+I created my own database containing all 5000 Gymki user codes. When someone purchased a ticket on the SFW website, I would get a confirmation email for the transaction. I used [**Zapier**](https://zapier.com/) to create an email parser that would extract the purchaser's information. Zapier would then go into my database, search for a user code that hadn't been used yet, pull the code while marking it as used, then email it to the purchaser whose information it parsed.
+<br />
 
-## Why I Built It / How I Use It
-Explain the real-world problem the project solves, especially how it makes your job (or someone else’s) easier. Highlight efficiency gains, automation, or improvements over previous methods.
+## **Takeaways**
+This was my first paid technical project, and was a successful starting point for the very first Fitness Week event. The project consisted only of Zapier and Google Suite tools: purchase confirmation emails were sent to my Gmail account, and my database was created as a Google Sheet. I trained Zapier to interact accordingly with GSuite. While this was a great starting point, it wasn't super scalable and wouldn't have been as successful handling extremely high traffic. If I had the opportunity to do it again in the future, I would build a stronger database using MongoDB and code out a more durable and efficient solution. 
+<br />
 
-## Key Features / Takeaways
-- Feature 1 (e.g., automated scheduling, intuitive UI, custom reports)  
-- Feature 2  
-- Feature 3
 
