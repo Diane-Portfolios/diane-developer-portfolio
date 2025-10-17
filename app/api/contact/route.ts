@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy initialize Resend to avoid build-time errors
+const getResend = () => {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not configured')
+  }
+  return new Resend(apiKey)
+}
 
 export async function POST(request: Request) {
   try {
@@ -17,6 +24,7 @@ export async function POST(request: Request) {
     }
 
     // Send email using Resend
+    const resend = getResend()
     const data = await resend.emails.send({
       from: 'Contact Form <onboarding@resend.dev>', // This is the default Resend test sender
       to: 'diane.stephani@gmail.com',
