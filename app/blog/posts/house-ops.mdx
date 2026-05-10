@@ -1,0 +1,20 @@
+---
+title: 'Household OS'
+publishedAt: '2026-05-09'
+summary: 'A personal household management system that generates a daily plan from your routines, energy level, and calendar — with a Claude-powered chat assistant for free-form edits.'
+---
+
+[**Live Demo Link**](https://household-os-dashboard.onrender.com)  | [**GitHub Link**](https://github.com/dianestephani/household-os)
+<br />
+
+## **Overview**
+Household OS is a single-user "household ops" assistant that knows my recurring routines and their cadences, generates a daily plan sized to that day's available energy and time, and lets me swap, defer, or mark items done from a dashboard, voice (Alexa), or chat. It's deliberately built to be set up and walked away from — it leans on Google Calendar, RocketMoney, and Alexa instead of rebuilding them, and pushes a single source of truth (Mongo) out to every surface so two views never drift.
+<br />
+
+## **How It Works**
+The stack is MERN end-to-end with TypeScript everywhere: MongoDB Atlas for storage, Express for the API, React + Vite for the dashboard, and an Alexa custom skill mounted on the same Express server via `ask-sdk-express-adapter`. Every mutation goes through Express, which writes Mongo, which fires a debounced publisher that fans out to Google Calendar (one all-day event with a checklist) and Alexa (Proactive Events notification). A `node-cron` job at 6 AM runs the morning generator: it classifies the day from Google Calendar, pulls due rolling routines, fixed-day routines, the current week's zone-rotation task, and event-driven adds (Airbnb prep, dogsit prep, landscaper visits), then packs them into a budget by energy and priority. Two Claude personas — Household Ops and Finance, both running on `claude-opus-4-7` with prompt caching on the system prompt and tool definitions — handle free-form chat. They share a context journal subsystem so qualitative notes ("today is rough, 5 dogsit guests, blocked from working out") persist across sessions and bias future suggestions. The Finance persona has its own subsystem with a 2025 federal/FICA/state tax estimator, an outsourceable-routines table, and a greedy affordability report that splits routines into "fits within discretionary" vs "exceeds." 158 tests cover the API and skill.
+<br />
+
+## **Why I Built It / How I Use It**
+I built Household OS because I have a hyperfixate-then-burnout pattern with side projects and a real need to manage a 3-bedroom rental with 2 cats, 2 dogs, frequent dogsit guests, Airbnb turnovers, and weekend catering gigs. Off-the-shelf tools either required too much manual upkeep or didn't reason about my actual energy on a given day. This project let me design the whole system end-to-end — data modeling, cron orchestration, multi-surface publishing, voice integration, and Claude tool-use loops — while solving a problem I genuinely have. I use it daily: the Alexa skill speaks the morning brief, the dashboard's Today panel and energy buttons drive most edits, and the Finance persona helps me decide which routines to outsource without silently overspending.
+<br />
