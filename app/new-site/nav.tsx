@@ -10,8 +10,11 @@ import { CyclingTitle } from './cycling-title'
 // links and title can't share a 576px row without colliding.
 export function NewSiteNav() {
   return (
-    <nav className="absolute inset-x-0 top-0 z-20 tracking-tight">
-      <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 pt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
+    // In normal flow rather than overlaid, so the background band below can
+    // begin exactly where the navbar ends without hardcoding its height —
+    // which differs between the stacked mobile layout and the single desktop row.
+    <nav className="relative z-20 shrink-0 tracking-tight">
+      <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 pb-4 pt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
         <div className="ns-enter-nav -ml-[8px] flex flex-row">
           {Object.entries(navItems).map(([path, { name }]) => (
             <Link
