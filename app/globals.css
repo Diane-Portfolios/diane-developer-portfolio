@@ -177,19 +177,71 @@ table {
 }
 
 .ns-enter-nav {
-  animation: ns-fade-down 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+  animation: ns-fade-down 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
 
 /* Applied to the image *inside* the positioning wrapper. The wrapper owns the
    centring translate; if this animated transform lived on the same element it
    would overwrite it and knock the screen off-centre mid-animation. */
 .ns-enter-gameboy {
-  animation: ns-fade-up 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+  animation: ns-fade-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+}
+
+/* Cycling title. Each phrase's base state is opacity 0; the animation does
+   nothing but hold opacity 1 for the length of its slot, so a phrase is visible
+   only inside its own window. Fill-mode is deliberately left at `none` — that's
+   what makes the span vanish again once its slot ends. */
+@keyframes ns-cycle-slot {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ns-cycle-slot {
+  opacity: 0;
+  animation-name: ns-cycle-slot;
+  animation-timing-function: steps(1, end);
+  animation-fill-mode: none;
+}
+
+/* Every phrase occupies the same single grid cell, so the stack's width is the
+   width of the *widest* phrase and never changes as phrases swap. That's what
+   keeps the name to its left from being pushed around — the name is one element
+   rendered once, and nothing downstream of it can move it. */
+.ns-cycle-stack {
+  display: grid;
+}
+
+.ns-cycle-stack > * {
+  grid-area: 1 / 1;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+@keyframes ns-cycle-final {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Base opacity 1 so that if the animation is disabled the settled phrase is
+   simply there. The delay is set inline from CYCLE_DURATION_MS. */
+.ns-cycle-final {
+  opacity: 1;
+  animation: ns-cycle-final 0.3s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ns-enter-nav,
-  .ns-enter-gameboy {
+  .ns-enter-gameboy,
+  .ns-cycle-slot,
+  .ns-cycle-final {
     animation: none;
   }
 }
