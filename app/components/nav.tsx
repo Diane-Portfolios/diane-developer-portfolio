@@ -1,6 +1,8 @@
 import Link from 'next/link'
 
-const navItems = {
+// Exported so the redesign's navbar (app/new-site/nav.tsx) links to the same
+// places without a second copy of this list drifting out of sync.
+export const navItems = {
   '/': {
     name: 'home',
   },

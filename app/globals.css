@@ -148,3 +148,48 @@ table {
 .title {
   text-wrap: balance;
 }
+
+/* --- /new-site entrance animations ---------------------------------------
+   Pure CSS, so they run on first paint with no client JS and no hydration
+   flash. `both` fill-mode holds the from-state before the delay elapses,
+   which is what staggers the navbar ahead of the console. */
+
+@keyframes ns-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ns-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ns-enter-nav {
+  animation: ns-fade-down 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+
+/* Applied to the image *inside* the positioning wrapper. The wrapper owns the
+   centring translate; if this animated transform lived on the same element it
+   would overwrite it and knock the screen off-centre mid-animation. */
+.ns-enter-gameboy {
+  animation: ns-fade-up 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-enter-nav,
+  .ns-enter-gameboy {
+    animation: none;
+  }
+}

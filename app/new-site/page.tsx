@@ -1,25 +1,47 @@
-import Link from 'next/link'
+import Image from 'next/image'
+import { NewSiteNav } from './nav'
+
+// Measured off the source PNG (812x1046) by scanning for the dark LCD panel:
+// bbox x 167..636, y 127..549. Its centre lands at 49.45% / 32.31% of the image
+// — noticeably above the image's own midpoint, since the console's body extends
+// much further below the screen than above it.
+const SCREEN_CENTRE_X = 49.45
+const SCREEN_CENTRE_Y = 32.31
+
+// Sizing: the console is 812/1046 ≈ 0.776 wide-to-tall. With the screen centre
+// pinned to the viewport centre, the taller half is the 67.69% below it, so the
+// whole console stays on screen while that half fits in 50vh — i.e. up to ~73vh.
+// The 122vw term is the same limit expressed for narrow viewports, so the
+// console shrinks rather than overflowing on a phone.
+const SIZE = 'min(73vh, 122vw)'
 
 export default function NewSitePage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-        Work in progress
-      </p>
-      <h1 className="text-4xl font-semibold tracking-tighter sm:text-6xl">
-        New Site
-      </h1>
-      <p className="max-w-lg text-neutral-600 dark:text-neutral-300">
-        Blank canvas for the redesign. This page has its own layout — full
-        width, no navbar, no footer — so nothing here is constrained by the
-        current site.
-      </p>
-      <Link
-        href="/"
-        className="text-sm text-neutral-600 underline decoration-neutral-400 underline-offset-4 transition-colors hover:text-neutral-900 dark:text-neutral-300 dark:decoration-neutral-600 dark:hover:text-neutral-100"
+    <div className="relative h-screen overflow-hidden bg-black">
+      <NewSiteNav />
+
+      {/* This wrapper owns the centring. It's given the console's exact box —
+          height plus source aspect ratio — because the translate percentages
+          resolve against the element's own size, so a full-width wrapper would
+          shift it wrong. The image animates inside, transform-free. */}
+      <div
+        className="absolute left-1/2 top-1/2 z-10"
+        style={{
+          height: SIZE,
+          aspectRatio: '812 / 1046',
+          transform: `translate(-${SCREEN_CENTRE_X}%, -${SCREEN_CENTRE_Y}%)`,
+        }}
       >
-        back to the current site
-      </Link>
+        <Image
+          src="/assets/backgrounds/gameboy.png"
+          alt=""
+          aria-hidden
+          width={812}
+          height={1046}
+          priority
+          className="ns-enter-gameboy pointer-events-none h-full w-full select-none"
+        />
+      </div>
     </div>
   )
 }
