@@ -213,12 +213,36 @@ table {
    rendered once, and nothing downstream of it can move it. */
 .ns-cycle-stack {
   display: grid;
+  /* Which edge the stacked phrases align to. `start` keeps the navbar's roles
+     butted against the name; the location note overrides it to `end` so both
+     of its states share a right edge. */
+  --ns-stack-align: start;
 }
 
 .ns-cycle-stack > * {
   grid-area: 1 / 1;
-  justify-self: start;
+  justify-self: var(--ns-stack-align);
   white-space: nowrap;
+}
+
+/* The outgoing half of a dissolve. Needed because a stacked phrase that merely
+   stops animating hard-cuts to nothing — and since it paints above the incoming
+   text, it hides the fade-in entirely and the swap reads as a jump cut. Fading
+   it out over the same window lets the two genuinely dissolve. */
+@keyframes ns-cycle-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.ns-cycle-out {
+  opacity: 1;
+  animation-name: ns-cycle-out;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
 }
 
 @keyframes ns-cycle-final {
@@ -231,17 +255,24 @@ table {
 }
 
 /* Base opacity 1 so that if the animation is disabled the settled phrase is
-   simply there. The delay is set inline from CYCLE_DURATION_MS. */
+   simply there. Delay and duration are set inline from the shared timings. */
 .ns-cycle-final {
   opacity: 1;
-  animation: ns-cycle-final 0.3s ease-out both;
+  animation: ns-cycle-final 0.3s linear both;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ns-enter-nav,
   .ns-enter-gameboy,
   .ns-cycle-slot,
+  .ns-cycle-out,
   .ns-cycle-final {
     animation: none;
+  }
+
+  /* With the animation off these would keep their base opacity of 1 and sit on
+     top of the settled text. Only the settled state should survive. */
+  .ns-cycle-out {
+    opacity: 0;
   }
 }

@@ -53,7 +53,24 @@ export function CyclingTitle({ className = '' }: { className?: string }) {
               animationDuration: `${i === lastIndex ? slot + FINAL_FADE_MS : slot}ms`,
             }}
           >
-            {role}
+            {/* The last phrase additionally fades out across the handoff. The
+                hold above and this fade multiply into hold-then-dissolve; on
+                its own the hold would hard-cut at full opacity and mask the
+                English fading in beneath it. Intermediate phrases keep their
+                hard cuts — that snap is the point of the cycle. */}
+            {i === lastIndex ? (
+              <span
+                className="ns-cycle-out"
+                style={{
+                  animationDelay: `${cycleWindow}ms`,
+                  animationDuration: `${FINAL_FADE_MS}ms`,
+                }}
+              >
+                {role}
+              </span>
+            ) : (
+              role
+            )}
           </span>
         ))}
       </span>

@@ -9,10 +9,11 @@ export const FINAL_ROLE = 'Software & Localization Engineer'
 // phrase, so the whole thing lands at exactly TOTAL_DURATION_MS.
 export const TOTAL_DURATION_MS = 4000
 
-// How long the English takes to fade up. The last cycling phrase is held this
-// much longer than its slot so the two crossfade — without the overlap the cycle
-// ends before the English is legible and you get a blank flicker between them.
-export const FINAL_FADE_MS = 200
+// Length of the dissolve into English. The outgoing text fades out across the
+// same window that the English fades in, so the two genuinely cross rather than
+// one cutting to the other. 300ms reads as a dissolve without leaving two
+// different strings legible on top of each other.
+export const FINAL_FADE_MS = 300
 
 // Order as requested. Slot timing divides the cycle window by however many
 // entries are here, so adding or removing a language repaces it automatically.
