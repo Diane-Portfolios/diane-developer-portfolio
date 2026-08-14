@@ -5,6 +5,7 @@ import {
   SCREEN_CENTRE_Y,
   SIZE,
 } from './console-geometry'
+import { AboutNote } from './about-note'
 import { GameBoyScreen } from './gameboy-screen'
 import { LocationNote } from './location-note'
 import { NewSiteNav } from './nav'
@@ -39,6 +40,7 @@ export default function NewSitePage() {
         </div>
       </div>
 
+      <AboutNote />
       <LocationNote />
 
       {/* Positioned against the full-height container, not the region above, so
