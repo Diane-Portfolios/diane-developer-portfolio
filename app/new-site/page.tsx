@@ -37,6 +37,13 @@ export default function NewSitePage() {
             priority
             className="pointer-events-none select-none object-cover"
           />
+
+          {/* Scrim over the whole photo. Sits inside the same box as the image
+              so it covers exactly what the image covers, and stays at this
+              layer so the console and the side text — both z-10 — sit above it
+              untouched. The navbar is already solid black and the strip below
+              the console is bare background, so neither needs covering. */}
+          <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
         </div>
       </div>
 

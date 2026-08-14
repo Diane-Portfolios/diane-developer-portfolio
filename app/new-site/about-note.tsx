@@ -37,22 +37,6 @@ export function AboutNote() {
         width: COLUMN,
       }}
     >
-      {/* Scrim. The background photo is brightest right about here, and the
-          body copy is the smallest text on the page, so it loses contrast.
-          A radial gradient rather than a panel: it has no edge to notice, and
-          the negative inset lets it fade out well past the text instead of
-          stopping at the column. -z-10 keeps it behind this block's own text
-          while staying above the photo — the block sets z-10 and is positioned,
-          so it forms its own stacking context and the scrim can't escape it. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -inset-x-[14%] -inset-y-[10%] -z-10"
-        style={{
-          background:
-            'radial-gradient(ellipse 78% 62% at 46% 50%, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.58) 42%, rgba(0,0,0,0.28) 70%, rgba(0,0,0,0) 100%)',
-        }}
-      />
-
       <h2
         className="whitespace-nowrap font-semibold tracking-tight text-white"
         style={{ fontSize: NAME_FONT }}
