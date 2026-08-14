@@ -3,12 +3,7 @@ import {
   RIGHT_COLUMN,
   SIDE_TEXT_VISIBLE,
 } from './console-geometry'
-import {
-  NON_CZECH_NAME,
-  SEQUENCE,
-  TOTAL_MS,
-  rotationStyle,
-} from './rotation'
+import { NON_CZECH_NAME, SEQUENCE, TOTAL_MS, rotationStyle } from './rotation'
 
 // Static for every language except Czech, which declines them (see below).
 const PLACES = ['Seattle, WA', 'Chicago, IL']
@@ -63,55 +58,60 @@ export function LocationNote() {
         left: `calc(${CONSOLE_RIGHT_FROM_LEFT} + var(--ns-side-gap))`,
       }}
     >
-      {/* All label states share one grid cell, so the lines below can't be
+      {/* Inner wrapper: the entrance animates transform, and the positioned
+          parent above carries the centring translate that it would clobber.
+          Staggered just behind the About block on the other side. */}
+      <div className="ns-enter-side" style={{ animationDelay: '0.7s' }}>
+        {/* All label states share one grid cell, so the lines below can't be
           nudged as they cross. */}
-      <div
-        className="ns-cycle-stack text-neutral-300"
-        style={{ fontSize: LABEL_FONT }}
-      >
-        {codes.map((code) => (
-          <span
-            key={code}
-            className={code === 'en' ? 'ns-rot-default' : 'ns-rot'}
-            aria-hidden={code === 'en' ? undefined : 'true'}
-            lang={code === 'en' ? undefined : code}
-            style={rotationStyle(code)}
-          >
-            {LABEL_BY_LANG[code]}
-          </span>
-        ))}
-      </div>
-
-      {/* Both place states share one cell so the block keeps one width and the
-          lines stay on the same baselines through the Czech substitution. */}
-      <div
-        className="ns-cycle-stack font-semibold tracking-tight text-white"
-        style={{ fontSize: PLACE_FONT }}
-      >
-        {/* Visible for every slot that isn't Czech. Its keyframes hold opacity
-            at 1 straight through consecutive slots rather than fading at each
-            boundary — otherwise identical text would pulse every few seconds. */}
         <div
-          className="ns-rot-default"
-          style={{
-            animationName: NON_CZECH_NAME,
-            animationDuration: `${TOTAL_MS}ms`,
-          }}
+          className="ns-cycle-stack text-neutral-300"
+          style={{ fontSize: LABEL_FONT }}
         >
-          {PLACES.map((place) => (
-            <p key={place}>{place}</p>
+          {codes.map((code) => (
+            <span
+              key={code}
+              className={code === 'en' ? 'ns-rot-default' : 'ns-rot'}
+              aria-hidden={code === 'en' ? undefined : 'true'}
+              lang={code === 'en' ? undefined : code}
+              style={rotationStyle(code)}
+            >
+              {LABEL_BY_LANG[code]}
+            </span>
           ))}
         </div>
 
+        {/* Both place states share one cell so the block keeps one width and the
+          lines stay on the same baselines through the Czech substitution. */}
         <div
-          aria-hidden="true"
-          lang="cs"
-          className="ns-rot"
-          style={rotationStyle('cs')}
+          className="ns-cycle-stack font-semibold tracking-tight text-white"
+          style={{ fontSize: PLACE_FONT }}
         >
-          {CZECH_PLACES.map((place) => (
-            <p key={place}>{place}</p>
-          ))}
+          {/* Visible for every slot that isn't Czech. Its keyframes hold opacity
+            at 1 straight through consecutive slots rather than fading at each
+            boundary — otherwise identical text would pulse every few seconds. */}
+          <div
+            className="ns-rot-default"
+            style={{
+              animationName: NON_CZECH_NAME,
+              animationDuration: `${TOTAL_MS}ms`,
+            }}
+          >
+            {PLACES.map((place) => (
+              <p key={place}>{place}</p>
+            ))}
+          </div>
+
+          <div
+            aria-hidden="true"
+            lang="cs"
+            className="ns-rot"
+            style={rotationStyle('cs')}
+          >
+            {CZECH_PLACES.map((place) => (
+              <p key={place}>{place}</p>
+            ))}
+          </div>
         </div>
       </div>
     </div>

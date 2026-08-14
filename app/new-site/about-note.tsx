@@ -37,19 +37,23 @@ export function AboutNote() {
         width: COLUMN,
       }}
     >
-      <h2
-        className="whitespace-nowrap font-semibold tracking-tight text-white"
-        style={{ fontSize: NAME_FONT }}
-      >
-        {NAME}
-      </h2>
+      {/* Inner wrapper: the entrance animates transform, and the positioned
+          parent above carries the centring translate that it would clobber. */}
+      <div className="ns-enter-side" style={{ animationDelay: '0.55s' }}>
+        <h2
+          className="whitespace-nowrap font-semibold tracking-tight text-white"
+          style={{ fontSize: NAME_FONT }}
+        >
+          {NAME}
+        </h2>
 
-      {/* Smaller at the narrowest widths: the column there is barely 200px, and
+        {/* Smaller at the narrowest widths: the column there is barely 200px, and
           at a larger size the copy runs long enough to fill the viewport. */}
-      <div className="mt-4 space-y-3 text-[0.8125rem] leading-relaxed text-neutral-300 xl:text-sm 2xl:text-[0.9375rem]">
-        {ABOUT.map((para) => (
-          <p key={para.slice(0, 24)}>{para}</p>
-        ))}
+        <div className="mt-4 space-y-3 text-[0.8125rem] leading-relaxed text-neutral-300 xl:text-sm 2xl:text-[0.9375rem]">
+          {ABOUT.map((para) => (
+            <p key={para.slice(0, 24)}>{para}</p>
+          ))}
+        </div>
       </div>
     </div>
   )

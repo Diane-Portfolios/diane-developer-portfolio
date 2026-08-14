@@ -187,6 +187,25 @@ table {
   animation: ns-fade-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
 }
 
+/* Entrance for the two side blocks. Applied to an inner wrapper, never to the
+   positioned element itself — those carry a centring -translate-y-1/2 that an
+   animated transform would overwrite. Delay is set inline so the two can be
+   staggered without a class each. */
+@keyframes ns-fade-in-side {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ns-enter-side {
+  animation: ns-fade-in-side 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Rotating text. Every rotating element runs one infinite animation of the same
    duration; only the keyframe name differs, and that name encodes which slots
    the element is visible for. Because they share a duration and start together,
@@ -229,6 +248,7 @@ table {
 @media (prefers-reduced-motion: reduce) {
   .ns-enter-nav,
   .ns-enter-gameboy,
+  .ns-enter-side,
   .ns-rot,
   .ns-rot-default {
     /* !important is load-bearing here, not defensive. Each rotating element
