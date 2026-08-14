@@ -187,35 +187,36 @@ table {
   animation: ns-fade-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
 }
 
-/* Cycling title. Each phrase's base state is opacity 0; the animation does
-   nothing but hold opacity 1 for the length of its slot, so a phrase is visible
-   only inside its own window. Fill-mode is deliberately left at `none` — that's
-   what makes the span vanish again once its slot ends. */
-@keyframes ns-cycle-slot {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 1;
-  }
-}
+/* Rotating text. Every rotating element runs one infinite animation of the same
+   duration; only the keyframe name differs, and that name encodes which slots
+   the element is visible for. Because they share a duration and start together,
+   the navbar role and the work location can never fall out of step.
 
-.ns-cycle-slot {
-  opacity: 0;
-  animation-name: ns-cycle-slot;
-  animation-timing-function: steps(1, end);
+   The @keyframes themselves are generated in ./new-site/rotation.ts and injected
+   by the page — the percentages depend on the slot count and fade length, and
+   deriving them here by hand would go stale the moment those change. */
+.ns-rot,
+.ns-rot-default {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
   animation-fill-mode: none;
 }
 
-/* Every phrase occupies the same single grid cell, so the stack's width is the
-   width of the *widest* phrase and never changes as phrases swap. That's what
-   keeps the name to its left from being pushed around — the name is one element
-   rendered once, and nothing downstream of it can move it. */
+.ns-rot {
+  opacity: 0;
+}
+
+/* Whatever should survive with animation switched off — the English entries. */
+.ns-rot-default {
+  opacity: 1;
+}
+
+/* Stacks every state into a single grid cell, so the box is as wide and tall as
+   its largest state and nothing reflows as they cross. */
 .ns-cycle-stack {
   display: grid;
-  /* Which edge the stacked phrases align to. `start` keeps the navbar's roles
-     butted against the name; the location note overrides it to `end` so both
-     of its states share a right edge. */
+  /* Which edge the stacked states align to. `start` keeps the navbar's roles
+     butted against the name; other callers can override. */
   --ns-stack-align: start;
 }
 
@@ -225,54 +226,20 @@ table {
   white-space: nowrap;
 }
 
-/* The outgoing half of a dissolve. Needed because a stacked phrase that merely
-   stops animating hard-cuts to nothing — and since it paints above the incoming
-   text, it hides the fade-in entirely and the swap reads as a jump cut. Fading
-   it out over the same window lets the two genuinely dissolve. */
-@keyframes ns-cycle-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-.ns-cycle-out {
-  opacity: 1;
-  animation-name: ns-cycle-out;
-  animation-timing-function: linear;
-  animation-fill-mode: both;
-}
-
-@keyframes ns-cycle-final {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Base opacity 1 so that if the animation is disabled the settled phrase is
-   simply there. Delay and duration are set inline from the shared timings. */
-.ns-cycle-final {
-  opacity: 1;
-  animation: ns-cycle-final 0.3s linear both;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .ns-enter-nav,
   .ns-enter-gameboy,
-  .ns-cycle-slot,
-  .ns-cycle-out,
-  .ns-cycle-final {
-    animation: none;
+  .ns-rot,
+  .ns-rot-default {
+    /* !important is load-bearing here, not defensive. Each rotating element
+       carries its keyframe name in an inline style attribute, and inline styles
+       outrank stylesheet rules — without this the rotation keeps running under
+       reduced motion and the page settles on whatever language it happens to be
+       mid-loop. */
+    animation: none !important;
   }
 
-  /* With the animation off these would keep their base opacity of 1 and sit on
-     top of the settled text. Only the settled state should survive. */
-  .ns-cycle-out {
-    opacity: 0;
-  }
+  /* With the rotation stopped these keep their base opacity, so only the
+     English entries remain — a continuous loop is exactly the kind of motion
+     this setting asks you to stop. */
 }

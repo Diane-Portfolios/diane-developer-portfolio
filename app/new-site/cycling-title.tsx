@@ -1,23 +1,16 @@
-import {
-  FINAL_FADE_MS,
-  FINAL_ROLE,
-  ROLE_PHRASES,
-  TITLE_PREFIX,
-  TOTAL_DURATION_MS,
-} from './cycle-phrases'
+import { ROLE_BY_LANG, TITLE_PREFIX } from './cycle-phrases'
+import { SEQUENCE, rotationStyle } from './rotation'
 
-// Holds TITLE_PREFIX in English while the role after it cycles through
-// ROLE_PHRASES, settling on FINAL_ROLE at TOTAL_DURATION_MS. No client JS —
-// each phrase is a stacked span whose CSS animation window is its slot, so it
-// runs on first paint with no hydration flash and no interval to keep in sync.
+// Holds TITLE_PREFIX in English while the role after it rotates through every
+// language, English included, on the shared clock in ./rotation. No client JS —
+// each role is a stacked span whose CSS animation keeps it visible for its own
+// slots, so it runs on first paint with no hydration flash and no interval.
 export function CyclingTitle({ className = '' }: { className?: string }) {
-  const cycleWindow = TOTAL_DURATION_MS - FINAL_FADE_MS
-  const slot = cycleWindow / ROLE_PHRASES.length
-  const lastIndex = ROLE_PHRASES.length - 1
+  const codes = [...new Set(SEQUENCE)]
 
   return (
-    // items-baseline keeps the name and the role sitting on one baseline even
-    // though the CJK entries have very different metrics from the Latin ones.
+    // items-baseline keeps the name and the role on one baseline even though
+    // the CJK entries have very different metrics from the Latin ones.
     <span
       className={`inline-flex items-baseline whitespace-nowrap ${className}`}
     >
@@ -25,52 +18,24 @@ export function CyclingTitle({ className = '' }: { className?: string }) {
           nothing to its right can resize it, so it cannot move. */}
       <span className="text-white">{TITLE_PREFIX}&nbsp;</span>
 
-      {/* Fixed-width column: as wide as the longest phrase, always. */}
-      <span className="ns-cycle-stack">
-        <span
-          className="ns-cycle-final text-white"
-          style={{
-            animationDelay: `${cycleWindow}ms`,
-            animationDuration: `${FINAL_FADE_MS}ms`,
-          }}
-        >
-          {FINAL_ROLE}
-        </span>
-
-        {ROLE_PHRASES.map((role, i) => (
+      {/* Fixed-width column: as wide as the longest role, always. The colour
+          lives here rather than on each state — without it these inherit the
+          root's light-mode black and vanish against the black navbar. */}
+      <span className="ns-cycle-stack text-neutral-300">
+        {codes.map((code) => (
           <span
-            key={i}
-            // Decorative: the settled role above is the accessible content, so
-            // announcing every intermediate phrase would just be noise.
-            aria-hidden="true"
-            // dir="auto" so an RTL language added later lays out correctly.
+            key={code}
+            // English is the one that survives if animation is disabled, so it
+            // carries the base-visible class and the rest are hidden.
+            className={code === 'en' ? 'ns-rot-default' : 'ns-rot'}
+            // Only English is exposed; the rotation would otherwise read as a
+            // dozen restatements of the same job title.
+            aria-hidden={code === 'en' ? undefined : 'true'}
+            lang={code === 'en' ? undefined : code}
             dir="auto"
-            className="ns-cycle-slot text-neutral-400"
-            style={{
-              animationDelay: `${i * slot}ms`,
-              // The last phrase is held through the English fade so the two
-              // overlap instead of leaving a blank frame between them.
-              animationDuration: `${i === lastIndex ? slot + FINAL_FADE_MS : slot}ms`,
-            }}
+            style={rotationStyle(code)}
           >
-            {/* The last phrase additionally fades out across the handoff. The
-                hold above and this fade multiply into hold-then-dissolve; on
-                its own the hold would hard-cut at full opacity and mask the
-                English fading in beneath it. Intermediate phrases keep their
-                hard cuts — that snap is the point of the cycle. */}
-            {i === lastIndex ? (
-              <span
-                className="ns-cycle-out"
-                style={{
-                  animationDelay: `${cycleWindow}ms`,
-                  animationDuration: `${FINAL_FADE_MS}ms`,
-                }}
-              >
-                {role}
-              </span>
-            ) : (
-              role
-            )}
+            {ROLE_BY_LANG[code]}
           </span>
         ))}
       </span>

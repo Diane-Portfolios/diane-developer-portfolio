@@ -6,13 +6,18 @@ import {
   SIZE,
 } from './console-geometry'
 import { GameBoyScreen } from './gameboy-screen'
-import { LanguageList } from './language-list'
 import { LocationNote } from './location-note'
 import { NewSiteNav } from './nav'
+import { ROTATION_CSS } from './rotation'
 
 export default function NewSitePage() {
   return (
     <div className="relative flex h-screen flex-col overflow-hidden bg-black">
+      {/* Generated rather than hand-written: the keyframe percentages depend on
+          the slot count and fade length, so deriving them in CSS by hand would go
+          stale the moment those change. Emitted once for the whole page. */}
+      <style dangerouslySetInnerHTML={{ __html: ROTATION_CSS }} />
+
       <NewSiteNav />
 
       {/* Everything below the navbar. The band is pinned to the top of this
@@ -35,7 +40,6 @@ export default function NewSitePage() {
       </div>
 
       <LocationNote />
-      <LanguageList />
 
       {/* Positioned against the full-height container, not the region above, so
           the centring still resolves against the viewport. */}

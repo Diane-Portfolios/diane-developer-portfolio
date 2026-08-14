@@ -1,16 +1,23 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { GameBoyMenu } from './gameboy-menu'
 
-// Played in order, then looped back to the first.
-const CLIPS = [
-  '/assets/animations/Game Boy Color - Startup Intro.webm',
-  '/assets/animations/Pokemon Yellow GBC Intro .webm',
-]
+const CLIP = '/assets/animations/Game Boy Color - Startup Intro.webm'
 
-// Crossfade between clips. Short enough to read as a cut, long enough to cover
-// the first decoded frame of the incoming clip so there's never a black gap.
-const CROSSFADE_MS = 220
+// Where to freeze, in seconds. Derived from a per-frame motion profile of the
+// clip rather than picked by eye: the logo animates until ~2.53s, sits
+// completely still from 2.57s to 3.10s, then starts washing out into the
+// fade at ~3.13s. 2.85s is the middle of that still plateau, showing solid
+// "GAME BOY" over "Nintendo®" with the most margin on either side.
+const FREEZE_AT = 2.85
+
+// How long the frozen logo stays up before the menu replaces it.
+const HOLD_MS = 3000
+
+// Length of the cut over to the menu. Short — a real console would switch
+// instantly, and anything slower reads as a dissolve rather than a boot.
+const SWITCH_MS = 180
 
 // The LCD panel's position within gameboy.png, measured off the source: bbox
 // x 167..636, y 127..549 of 812x1046. Expressed as percentages so it tracks the
@@ -23,66 +30,96 @@ const SCREEN = {
 }
 
 export function GameBoyScreen() {
-  const videos = useRef<(HTMLVideoElement | null)[]>([])
-  const [active, setActive] = useState(0)
-  const [enabled, setEnabled] = useState(true)
+  const video = useRef<HTMLVideoElement | null>(null)
+  const frame = useRef<number | null>(null)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [reduced, setReduced] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
 
-  // Auto-playing a ~49s loop is exactly the kind of motion reduced-motion asks
-  // you to stop. When it's set we leave the first frame up and never start.
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const apply = () => setEnabled(!mq.matches)
+    const apply = () => setReduced(mq.matches)
     apply()
     mq.addEventListener('change', apply)
     return () => mq.removeEventListener('change', apply)
   }, [])
 
-  useEffect(() => {
-    if (!enabled) return
-    const current = videos.current[active]
-    if (!current) return
-
-    current.currentTime = 0
-    // Muted autoplay is permitted, but a rejected play() must not throw.
-    void current.play().catch(() => {})
-
-    // Prime the next clip so its first frame is already decoded when its turn
-    // comes — without this the crossfade can reveal an undecoded black frame.
-    const next = videos.current[(active + 1) % CLIPS.length]
-    if (next) next.currentTime = 0
-  }, [active, enabled])
-
-  const handleEnded = useCallback(() => {
-    setActive((i) => (i + 1) % CLIPS.length)
+  const holdThenSwitch = useCallback(() => {
+    timer.current = setTimeout(() => setShowMenu(true), HOLD_MS)
   }, [])
+
+  // Watch on every animation frame rather than via timeupdate, which only fires
+  // about four times a second and would overshoot the freeze point by a wide
+  // and variable margin.
+  const watch = useCallback(() => {
+    const el = video.current
+    if (!el) return
+    if (el.currentTime >= FREEZE_AT) {
+      el.pause()
+      // Snap back to the exact mark: rAF can only catch it a frame late.
+      el.currentTime = FREEZE_AT
+      frame.current = null
+      holdThenSwitch()
+      return
+    }
+    frame.current = requestAnimationFrame(watch)
+  }, [holdThenSwitch])
+
+  useEffect(() => {
+    const el = video.current
+    if (!el) return
+
+    if (reduced) {
+      // Show the settled logo without ever animating to it, then still give the
+      // hold before the menu — the swap is a content change, not motion.
+      el.pause()
+      el.currentTime = FREEZE_AT
+      holdThenSwitch()
+    } else {
+      el.currentTime = 0
+      // Muted autoplay is permitted, but a rejected play() must not throw.
+      void el.play().catch(() => {})
+      frame.current = requestAnimationFrame(watch)
+    }
+
+    return () => {
+      if (frame.current !== null) cancelAnimationFrame(frame.current)
+      if (timer.current !== null) clearTimeout(timer.current)
+      frame.current = null
+      timer.current = null
+    }
+  }, [reduced, watch, holdThenSwitch])
 
   return (
     <div
       className="pointer-events-none absolute overflow-hidden rounded-[2px]"
-      style={SCREEN}
-      // Decorative: the clips carry no information the page doesn't already give.
+      // container-type lets the menu size itself in cqh/cqw against this box.
+      style={{ ...SCREEN, containerType: 'size' }}
+      // Decorative: the clip carries no information the page doesn't already give.
       aria-hidden="true"
     >
-      {CLIPS.map((src, i) => (
-        <video
-          key={src}
-          ref={(el) => {
-            videos.current[i] = el
-          }}
-          // encodeURI because both filenames contain spaces — and the second
-          // has one immediately before the extension.
-          src={encodeURI(src)}
-          muted
-          playsInline
-          preload="auto"
-          onEnded={handleEnded}
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{
-            opacity: i === active ? 1 : 0,
-            transition: `opacity ${CROSSFADE_MS}ms linear`,
-          }}
-        />
-      ))}
+      <video
+        ref={video}
+        // encodeURI because the filename contains spaces.
+        src={encodeURI(CLIP)}
+        muted
+        playsInline
+        preload="auto"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{
+          opacity: showMenu ? 0 : 1,
+          transition: reduced ? undefined : `opacity ${SWITCH_MS}ms linear`,
+        }}
+      />
+
+      <div
+        style={{
+          opacity: showMenu ? 1 : 0,
+          transition: reduced ? undefined : `opacity ${SWITCH_MS}ms linear`,
+        }}
+      >
+        <GameBoyMenu />
+      </div>
     </div>
   )
 }
