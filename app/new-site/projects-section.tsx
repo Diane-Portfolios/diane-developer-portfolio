@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import type { CSSProperties } from 'react'
 import { ScrollReveal } from './scroll-reveal'
 
 const THUMB_SIZE = 64
@@ -43,22 +42,12 @@ async function getPokemonSprites(name: string) {
 // pixel sprite.
 function Sprite({
   src,
-  marginLeftPx,
   flip,
 }: {
   src: string
-  marginLeftPx?: number
-  // Mirrors the artwork horizontally via CSS, around the image's own centre —
-  // this changes what's *drawn* inside the box, not the box itself, so it
-  // doesn't touch marginLeftPx's positioning. It does, however, swap which
-  // side of the source PNG ends up at the box's left edge, which is why
-  // marginLeftPx can't always be reused as-is after flipping — see the
-  // comment on Ceruledge's usage below for why it happens to still work here.
+  // Mirrors the artwork horizontally via CSS, around the image's own centre.
   flip?: boolean
 }) {
-  const style: CSSProperties = {}
-  if (marginLeftPx !== undefined) style.marginLeft = marginLeftPx
-  if (flip) style.transform = 'scaleX(-1)'
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -68,7 +57,7 @@ function Sprite({
       width={SPRITE_SIZE}
       height={SPRITE_SIZE}
       className="pointer-events-none select-none"
-      style={Object.keys(style).length ? style : undefined}
+      style={flip ? { transform: 'scaleX(-1)' } : undefined}
     />
   )
 }
@@ -90,35 +79,17 @@ function ProjectLabel() {
   )
 }
 
-// One ball+sprite+ball+sprite row on a pill — the template. Two of these
-// exist, differing only in which Pokémon they show and (optionally) how far
-// the left sprite is pulled toward its ball.
-//
-// leftBodyMarginPx overrides the left sprite's plain gap-4 spacing. It exists
-// because a sprite's bounding box often isn't where the character visually
-// reads as being — Hisuian Typhlosion's pose trails a tail far past its own
-// body, so aligning by the box (the default) left the actual body no closer
-// to the ball at all. The fix, applied per-Pokémon rather than globally: pull
-// the official-artwork PNG down, scan its alpha channel for the leftmost
-// opaque pixel, walk outward from there while the silhouette changes
-// smoothly (following the trailing appendage), and take the next-most-extreme
-// point outside that band as "the body." Solve the margin that lands the body
-// clear of the ball by the target gap. The appendage itself is free to
-// overlap the ball as a consequence — that reads as it trailing behind rather
-// than the sprite floating unnaturally far away.
-//
-// The right sprite is never tuned this way — it stays at the plain gap-4 for
-// both rows, matching the template's original asymmetry (Charizard was never
-// tuned either) rather than re-deriving a correction nobody asked for.
+// One ball+sprite+ball+sprite row on a pill — the template. Every row uses
+// the same plain gap-4 spacing on both sides, so the left-hand sprites line
+// up in a consistent column down the page regardless of what each one's own
+// bounding box looks like — no per-Pokémon margin tuning.
 async function PillRow({
   leftPokemon,
   rightPokemon,
-  leftBodyMarginPx,
   flipLeftSprite,
 }: {
   leftPokemon: string
   rightPokemon: string
-  leftBodyMarginPx?: number
   flipLeftSprite?: boolean
 }) {
   const [leftSprites, rightSprites] = await Promise.all([
@@ -158,13 +129,7 @@ async function PillRow({
           className="pointer-events-none select-none"
         />
 
-        {leftSpriteUrl && (
-          <Sprite
-            src={leftSpriteUrl}
-            marginLeftPx={leftBodyMarginPx}
-            flip={flipLeftSprite}
-          />
-        )}
+        {leftSpriteUrl && <Sprite src={leftSpriteUrl} flip={flipLeftSprite} />}
       </div>
 
       {/* Room for a project name + subtitle in the pill's open middle,
@@ -198,66 +163,78 @@ async function PillRow({
   )
 }
 
-// The section below About. Just the heading and two Pokémon pill rows — real
-// project entries replace the placeholder labels once there's something to
-// show. The plain, unpaired Poké Balls that used to stack below these (left
-// over from before any pill existed) are gone now that every ball on the page
-// sits inside one.
+// All six Pokémon pill rows, on their own plain black section below
+// ExperienceSection, with the "Projects" title right above the first pill —
+// text-right to keep the About/Experience/Projects alternation going (About
+// right, Experience left, Projects right) now that Projects has its own
+// section again rather than sharing ExperienceSection's row. Real project
+// entries replace the placeholder labels once there's something to show. The
+// plain, unpaired Poké Balls that used to stack below these (left over from
+// before any pill existed) are gone now that every ball on the page sits
+// inside one.
 export async function ProjectsSection() {
   return (
     <section className="relative bg-black">
-      {/* Same max-w-6xl / px rhythm as the nav and the About section, so all
-          three line up horizontally regardless of which edge their content
-          hugs. No top padding to clear the fixed nav here — unlike About,
-          this section never starts at the top of the viewport on load or on a
-          direct scroll-to, so nothing needs to duck out from under it. */}
-      <div className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        {/* No max-w-xl cap here (unlike About's paragraph column) — each pill
-            needs to reach this container's own edges, which are exactly "the
-            appropriate margin of the page": the same max-w-6xl/px-4/sm:px-6
-            gutter already used by the nav and About, not a new margin
-            invented for this element. */}
-        <ScrollReveal>
-          {/* No ml-auto / text-right here — About pushed right, this pushes
-              left, so the two sections read as a deliberate alternation rather
-              than everything defaulting to one side. */}
+      {/* Same max-w-6xl / px rhythm as the nav and the About section, so this
+          lines up with them horizontally. pt-24/pb-24: symmetric now that the
+          heading lives in here again, matching the breathing room the bottom
+          edge always had. */}
+      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
+        <ScrollReveal className="text-right">
           <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Projects
           </h2>
+        </ScrollReveal>
 
-          <div className="mt-8 flex flex-col items-start gap-4">
-            {/* Hisuian Typhlosion (Fire/Ghost) — a distinct PokeAPI entry
-                from base Typhlosion, keyed by the "-hisui" regional-form
-                suffix, national dex #10233 — paired with Charizard.
-                -32px: the tail is the sprite's true leftmost point, but the
-                body (the mane, near the top of the pose) sits 36px into the
-                128px box. -44px was solved to land the mane exactly 8px from
-                the ball; -32px backs off by 12px so it reads as "moved right
-                a little" rather than pinned to that exact figure. */}
-            <PillRow
-              leftPokemon="typhlosion-hisui"
-              rightPokemon="charizard"
-              leftBodyMarginPx={-32}
-            />
+        {/* Each pill gets its own ScrollReveal rather than one wrapping the
+            whole list — that made every row appear at once the moment the
+            top of the list crossed into view. Individual observers mean each
+            row fades in independently right as it crosses the threshold, so
+            they render one-by-one while the visitor scrolls down them.
+            w-full on the wrapper matters: without it the wrapper (now the
+            actual flex child) shrinks to fit content under this container's
+            items-start, and PillRow's own w-full inside it would have
+            nothing to be 100% of. items-start still reads as centred — every
+            pill is w-full, so cross-axis alignment never actually shows. */}
+        <div className="mt-8 flex flex-col items-start gap-4">
+          {/* Hisuian Typhlosion (Fire/Ghost) — a distinct PokeAPI entry
+              from base Typhlosion, keyed by the "-hisui" regional-form
+              suffix, national dex #10233 — paired with Charizard. */}
+          <ScrollReveal className="w-full">
+            <PillRow leftPokemon="typhlosion-hisui" rightPokemon="charizard" />
+          </ScrollReveal>
 
-            {/* Ceruledge (Fire/Ghost), flipped to face left — its official
-                artwork faces right unflipped — paired with Milotic, which
-                already faces left without needing one.
-                -34px still applies after the flip: Ceruledge's pose turned
-                out to be near-perfectly bilaterally symmetric, so the source
-                image's right-side profile (which becomes the box's left edge
-                once mirrored) landed the body point at the same 38px-into-
-                the-box offset the unflipped left side gave — confirmed by
-                re-running the same alpha-scan on that side rather than
-                assuming the symmetry held. */}
+          {/* Ceruledge (Fire/Ghost), flipped — paired with Milotic. */}
+          <ScrollReveal className="w-full">
+            <PillRow leftPokemon="ceruledge" rightPokemon="milotic" flipLeftSprite />
+          </ScrollReveal>
+
+          {/* Annihilape, flipped — paired with Scovillain. */}
+          <ScrollReveal className="w-full">
+            <PillRow leftPokemon="annihilape" rightPokemon="scovillain" flipLeftSprite />
+          </ScrollReveal>
+
+          {/* Basculegion, flipped — paired with Dragapult. PokeAPI has no
+              bare "basculegion" — it only resolves as basculegion-male or
+              basculegion-female — so the male variety is used here. */}
+          <ScrollReveal className="w-full">
             <PillRow
-              leftPokemon="ceruledge"
-              rightPokemon="milotic"
-              leftBodyMarginPx={-34}
+              leftPokemon="basculegion-male"
+              rightPokemon="dragapult"
               flipLeftSprite
             />
-          </div>
-        </ScrollReveal>
+          </ScrollReveal>
+
+          {/* Froslass, unflipped — paired with Skeledirge. */}
+          <ScrollReveal className="w-full">
+            <PillRow leftPokemon="froslass" rightPokemon="skeledirge" />
+          </ScrollReveal>
+
+          {/* Golurk, flipped — paired with Garchomp. */}
+          <ScrollReveal className="w-full">
+            <PillRow leftPokemon="golurk" rightPokemon="garchomp" flipLeftSprite />
+          </ScrollReveal>
+        </div>
       </div>
     </section>
   )

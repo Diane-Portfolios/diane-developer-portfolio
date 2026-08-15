@@ -7,6 +7,7 @@ import {
 } from './console-geometry'
 import { AboutNote } from './about-note'
 import { AboutSection } from './about-section'
+import { ExperienceSection } from './experience-section'
 import { GameBoyScreen } from './gameboy-screen'
 import { LocationNote } from './location-note'
 import { NewSiteNav } from './nav'
@@ -86,6 +87,7 @@ export default function NewSitePage() {
       </section>
 
       <AboutSection />
+      <ExperienceSection />
       <ProjectsSection />
     </>
   )
