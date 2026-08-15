@@ -1,6 +1,6 @@
-// Shared geometry for the console on /new-site. Everything that has to line up
-// with it derives from these values rather than re-deriving its own, so the
-// pieces cannot drift apart.
+// Shared geometry for the console on the homepage. Everything that has to
+// line up with it derives from these values rather than re-deriving its own,
+// so the pieces cannot drift apart.
 
 // Measured off the source PNG (812x1046) by scanning for the dark LCD panel:
 // bbox x 167..636, y 127..549. Its centre lands at 49.45% / 32.31% of the image

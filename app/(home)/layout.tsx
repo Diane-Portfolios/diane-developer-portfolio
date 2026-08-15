@@ -1,15 +1,10 @@
-import type { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'New Site',
-  description: 'Work-in-progress redesign of Diane Stephani’s portfolio.',
-  // Keep the redesign out of search results until it replaces the live site.
-  robots: { index: false, follow: false },
-}
-
-// Deliberately empty chrome. No width cap, no nav, no footer — build the new
-// design's shell here as it takes shape.
-export default function NewSiteLayout({
+// No metadata export here — this route group is the site's homepage now, so
+// it just inherits the root layout's title/description/robots (indexed,
+// followed) rather than overriding them.
+//
+// Deliberately empty chrome otherwise. No width cap, no nav, no footer beyond
+// what the page itself renders.
+export default function HomeLayout({
   children,
 }: {
   children: React.ReactNode

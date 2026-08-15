@@ -31,6 +31,11 @@
 
 html {
   min-width: 360px;
+  /* The homepage nav scrolls to in-page sections (#about, #experience, etc.)
+     via plain <a href="#..."> rather than any JS scroll call, so this is what
+     makes those jumps glide instead of snapping instantly. Turned back off
+     under prefers-reduced-motion below. */
+  scroll-behavior: smooth;
 }
 
 .prose .anchor {
@@ -263,6 +268,12 @@ table {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    /* Anchor-nav jumps snap instantly instead of gliding — a multi-section
+       scroll animation is exactly the motion this setting asks to remove. */
+    scroll-behavior: auto;
+  }
+
   .ns-enter-nav,
   .ns-enter-gameboy,
   .ns-enter-side,

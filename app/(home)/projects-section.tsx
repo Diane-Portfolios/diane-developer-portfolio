@@ -174,7 +174,9 @@ async function PillRow({
 // inside one.
 export async function ProjectsSection() {
   return (
-    <section className="relative bg-black">
+    // id="projects" is the nav's anchor target; scroll-mt-24 clears the fixed
+    // nav the same way Experience's does.
+    <section id="projects" className="relative scroll-mt-24 bg-black">
       {/* Same max-w-6xl / px rhythm as the nav and the About section, so this
           lines up with them horizontally. pt-24/pb-24: symmetric now that the
           heading lives in here again, matching the breathing room the bottom

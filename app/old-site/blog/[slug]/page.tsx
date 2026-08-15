@@ -84,7 +84,7 @@ export default async function Blog({
             image: post.metadata.image
               ? `${baseUrl}${post.metadata.image}`
               : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/blog/${post.slug}`,
+            url: `${baseUrl}/old-site/blog/${post.slug}`,
             author: {
               '@type': 'Person',
               name: 'My Portfolio',

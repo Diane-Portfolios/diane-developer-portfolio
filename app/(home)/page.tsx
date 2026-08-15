@@ -7,14 +7,15 @@ import {
 } from './console-geometry'
 import { AboutNote } from './about-note'
 import { AboutSection } from './about-section'
+import { ContactSection } from './contact-section'
 import { ExperienceSection } from './experience-section'
 import { GameBoyScreen } from './gameboy-screen'
 import { LocationNote } from './location-note'
-import { NewSiteNav } from './nav'
+import { SiteNav } from './nav'
 import { ProjectsSection } from './projects-section'
 import { ROTATION_CSS } from './rotation'
 
-export default function NewSitePage() {
+export default function HomePage() {
   return (
     <>
       {/* Generated rather than hand-written: the keyframe percentages depend on
@@ -25,12 +26,15 @@ export default function NewSitePage() {
       {/* Fixed, so it stays put while everything below scrolls under it. Being
           out of flow it no longer pushes the hero down, which is what lets the
           hero be exactly one viewport tall. */}
-      <NewSiteNav />
+      <SiteNav />
 
       {/* The hero is exactly one screen, so its bottom edge is the break point:
           everything in here scrolls away as one piece and the next section
-          arrives behind it. */}
-      <section className="relative h-screen overflow-hidden bg-black">
+          arrives behind it. id="home" is the nav's anchor target — no
+          scroll-margin-top on it (unlike the sections below), since the hero
+          already starts at the literal top of the page and the fixed nav is
+          *meant* to overlay its first ~90px rather than be cleared. */}
+      <section id="home" className="relative h-screen overflow-hidden bg-black">
         {/* The photo runs from the very top of the hero — the opaque navbar
             covers its first ~90px, so it still reads as starting beneath the
             nav without the layout having to know how tall the nav is. */}
@@ -89,6 +93,7 @@ export default function NewSitePage() {
       <AboutSection />
       <ExperienceSection />
       <ProjectsSection />
+      <ContactSection />
     </>
   )
 }

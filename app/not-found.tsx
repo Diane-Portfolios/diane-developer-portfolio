@@ -1,5 +1,5 @@
 // Global 404 for URLs that match no route group, so it renders against the bare
-// root layout and carries its own container. In-site 404s use (portfolio)/not-found.tsx.
+// root layout and carries its own container. In-site 404s use old-site/not-found.tsx.
 export default function NotFound() {
   return (
     <div className="max-w-xl mx-4 mt-8 lg:mx-auto">

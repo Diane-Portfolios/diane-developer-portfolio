@@ -4,12 +4,17 @@ import { ScrollReveal } from './scroll-reveal'
 // than lorem ipsum) so it can't accidentally ship as real copy.
 const PLACEHOLDER = 'Write your About paragraph here.'
 
-// The section below the hero. Its own component, matching the pattern the rest
-// of /new-site follows — one file per block — so it can keep growing
+// The section below the hero. Its own component, matching the pattern the
+// rest of the homepage follows — one file per block — so it can keep growing
 // independently as more sections get added beneath it.
 export function AboutSection() {
   return (
-    <section className="relative bg-black">
+    // id="about" is the nav's anchor target. scroll-mt-24 isn't needed here
+    // like it is on Experience/Projects below — the pt-32 padding already
+    // clears the fixed nav on its own (see the comment on it) — but it's
+    // harmless to have both, and keeps this section consistent with the
+    // others if that padding ever changes.
+    <section id="about" className="relative scroll-mt-24 bg-black">
       {/* Same max-w-6xl / px rhythm as the fixed nav, so this column lines up
           with it horizontally. pt-32 clears the nav with room to spare — the
           nav is fixed and overlays the top of every section as it scrolls

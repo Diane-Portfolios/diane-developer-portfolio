@@ -10,7 +10,12 @@ import { ScrollReveal } from './scroll-reveal'
 // so this band is just the "Experience" title on its own.
 export function ExperienceSection() {
   return (
-    <section className="relative bg-black">
+    // id="experience" is the nav's anchor target. scroll-mt-24 clears the
+    // fixed nav on a direct jump here — unlike About, this section has no
+    // padding of its own that happens to already cover that (py-24 is
+    // symmetric top/bottom, sized for breathing room around the heading, not
+    // for nav clearance).
+    <section id="experience" className="relative scroll-mt-24 bg-black">
       <div aria-hidden="true" className="absolute inset-0 z-0">
         <Image
           src="/assets/backgrounds/unsplash-retro-desk.jpg"

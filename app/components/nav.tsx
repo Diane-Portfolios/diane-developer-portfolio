@@ -1,19 +1,17 @@
 import Link from 'next/link'
 
-// Exported so the redesign's navbar (app/new-site/nav.tsx) links to the same
-// places without a second copy of this list drifting out of sync.
+// This is the old site's own nav now — the redesign graduated to the real
+// homepage (app/(home)) and has its own anchor-based nav, so these paths only
+// need to stay correct relative to old-site's own new /old-site prefix.
 export const navItems = {
-  '/': {
+  '/old-site': {
     name: 'home',
   },
-  '/blog': {
+  '/old-site/blog': {
     name: 'projects',
   },
-  '/contact': {
+  '/old-site/contact': {
     name: 'contact',
-  },
-  '/new-site': {
-    name: 'New Site',
   },
 }
 
