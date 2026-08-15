@@ -1,4 +1,4 @@
-import { getBlogPosts } from './blog/utils'
+import { getBlogPosts } from './(portfolio)/blog/utils'
 
 export const baseUrl = 'https://diane-developer-portfolio.vercel.app'
 

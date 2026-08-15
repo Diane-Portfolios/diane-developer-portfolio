@@ -148,3 +148,146 @@ table {
 .title {
   text-wrap: balance;
 }
+
+/* --- /new-site entrance animations ---------------------------------------
+   Pure CSS, so they run on first paint with no client JS and no hydration
+   flash. `both` fill-mode holds the from-state before the delay elapses,
+   which is what staggers the navbar ahead of the console. */
+
+@keyframes ns-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ns-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ns-enter-nav {
+  animation: ns-fade-down 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* Applied to the image *inside* the positioning wrapper. The wrapper owns the
+   centring translate; if this animated transform lived on the same element it
+   would overwrite it and knock the screen off-centre mid-animation. */
+.ns-enter-gameboy {
+  animation: ns-fade-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+}
+
+/* Entrance for the two side blocks. Applied to an inner wrapper, never to the
+   positioned element itself — those carry a centring -translate-y-1/2 that an
+   animated transform would overwrite. Delay is set inline so the two can be
+   staggered without a class each. */
+@keyframes ns-fade-in-side {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ns-enter-side {
+  animation: ns-fade-in-side 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Scroll-triggered reveal for sections below the hero (see scroll-reveal.tsx).
+   A transition rather than a keyframe animation: the hero's ns-enter-* rules
+   start automatically at mount, but this one has to sit inert until JS adds
+   .ns-reveal-visible once the block has actually scrolled into view. */
+.ns-reveal {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ns-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Rotating text. Every rotating element runs one infinite animation of the same
+   duration; only the keyframe name differs, and that name encodes which slots
+   the element is visible for. Because they share a duration and start together,
+   the navbar role and the work location can never fall out of step.
+
+   The @keyframes themselves are generated in ./new-site/rotation.ts and injected
+   by the page — the percentages depend on the slot count and fade length, and
+   deriving them here by hand would go stale the moment those change. */
+.ns-rot,
+.ns-rot-default {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: none;
+}
+
+.ns-rot {
+  opacity: 0;
+}
+
+/* Whatever should survive with animation switched off — the English entries. */
+.ns-rot-default {
+  opacity: 1;
+}
+
+/* Stacks every state into a single grid cell, so the box is as wide and tall as
+   its largest state and nothing reflows as they cross. */
+.ns-cycle-stack {
+  display: grid;
+  /* Which edge the stacked states align to. `start` keeps the navbar's roles
+     butted against the name; other callers can override. */
+  --ns-stack-align: start;
+}
+
+.ns-cycle-stack > * {
+  grid-area: 1 / 1;
+  justify-self: var(--ns-stack-align);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-enter-nav,
+  .ns-enter-gameboy,
+  .ns-enter-side,
+  .ns-rot,
+  .ns-rot-default {
+    /* !important is load-bearing here, not defensive. Each rotating element
+       carries its keyframe name in an inline style attribute, and inline styles
+       outrank stylesheet rules — without this the rotation keeps running under
+       reduced motion and the page settles on whatever language it happens to be
+       mid-loop. */
+    animation: none !important;
+  }
+
+  /* Scroll reveals show immediately, in place, rather than sliding up when
+     the observer fires — the movement is exactly what this setting asks for
+     less of. The block still starts at opacity 0 in JS-disabled browsers
+     (there's no toggle to add .ns-reveal-visible), so this also covers that
+     case: content must not depend on JS to become visible. */
+  .ns-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* With the rotation stopped these keep their base opacity, so only the
+     English entries remain — a continuous loop is exactly the kind of motion
+     this setting asks you to stop. */
+}

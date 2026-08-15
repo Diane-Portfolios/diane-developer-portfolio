@@ -1,0 +1,20 @@
+---
+title: 'Wonderbot-1000'
+publishedAt: '2026-05-27'
+summary: 'An internal Slack bot that helps our team easily engage with our social media posts.'
+---
+
+[**GitHub Link**](https://github.com/PlayOneMoreGame/wonderbot-1000)
+<br />
+
+## **Overview**
+Wonderbot is an automation workflow that scrapes One More Game's social media channels — YouTube, Instagram, and TikTok — once or twice a day and generates a brief, friendly summary of any new posts. The summary links to each post and is dropped into a dedicated Slack channel so the team can quickly amplify them and join the conversation. It's an internal tool built to take the manual "did anyone see we posted?" step out of the loop.
+<br />
+
+## **How It Works**
+Wonderbot is an ASP.NET Core app on .NET 9, running as a background worker alongside a small Kestrel web server. On each run it pulls recent posts from three sources: the YouTube Data API, the Meta Graph API for Instagram, and a Playwright-driven headless Chromium browser for TikTok (which has no public API for profile posts). New posts are deduplicated against a SQLite database via Entity Framework Core, saved, then formatted into a Slack Block Kit message — a randomly cycled, least-recently-used greeting, an optional GIF, and one bulleted section per platform with each post's title linking out to it. In production it's deployed as a Docker container image on AWS Lambda: configuration is loaded from SSM Parameter Store so secrets never touch Terraform state, the SQLite database is synced to and from S3 for persistence between invocations, and EventBridge Scheduler triggers a scrape every 12 hours. The whole thing is covered by an xUnit test suite and a Buildkite CI/CD pipeline that runs tests, builds the image, and deploys to staging and live.
+<br />
+
+## **Why I Built It / How I Use It**
+I built Wonderbot as an engineer at One More Game to solve a recurring team problem: new social posts were easy to miss, so engagement from our own team was inconsistent. Now the bot surfaces everything in one Slack channel automatically, which makes it effortless for everyone to like, comment, and share. The project also pushed me deep into C# and .NET, serverless deployment on Lambda with container images, infrastructure-as-code with Terraform, and the realities of web scraping — including the cat-and-mouse of getting reliable data out of TikTok without an official API.
+<br />
