@@ -54,10 +54,3 @@ export const RIGHT_COLUMN = `calc(50vw - ${HALF_RIGHT} * ${SIZE} - var(--ns-side
 // columns to nothing. At exactly 4/3 the fit still holds at every size.
 export const SIDE_TEXT_VISIBLE =
   '[@media(min-width:1024px)_and_(min-aspect-ratio:4/3)]:block'
-
-// The About block needs more room than the short right-hand block: at 1024 the
-// left column is only ~200px, and a thousand characters of body copy there runs
-// taller than the viewport. 1200 is the narrowest width where it fits with
-// margin to spare.
-export const ABOUT_VISIBLE =
-  '[@media(min-width:1200px)_and_(min-aspect-ratio:4/3)]:block'

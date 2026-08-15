@@ -6,9 +6,11 @@ import {
   SIZE,
 } from './console-geometry'
 import { AboutNote } from './about-note'
+import { AboutSection } from './about-section'
 import { GameBoyScreen } from './gameboy-screen'
 import { LocationNote } from './location-note'
 import { NewSiteNav } from './nav'
+import { ProjectsSection } from './projects-section'
 import { ROTATION_CSS } from './rotation'
 
 export default function NewSitePage() {
@@ -83,9 +85,8 @@ export default function NewSitePage() {
         </div>
       </section>
 
-      {/* Placeholder for whatever comes next. It exists so the page actually
-          scrolls past the hero; replace it with real content. */}
-      <section id="next" className="min-h-screen bg-black" />
+      <AboutSection />
+      <ProjectsSection />
     </>
   )
 }

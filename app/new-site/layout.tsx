@@ -14,5 +14,17 @@ export default function NewSiteLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <div className="min-h-screen">{children}</div>
+  return (
+    <div className="min-h-screen">
+      {/* Scroll-reveal blocks (scroll-reveal.tsx) start at opacity 0 and need
+          JS — an IntersectionObserver — to ever become visible. Every other
+          entrance animation on this page is pure CSS and works with JS off;
+          this is the one exception, so it gets an explicit fallback rather
+          than silently losing content for JS-disabled visitors. */}
+      <noscript>
+        <style>{`.ns-reveal { opacity: 1 !important; transform: none !important; }`}</style>
+      </noscript>
+      {children}
+    </div>
+  )
 }

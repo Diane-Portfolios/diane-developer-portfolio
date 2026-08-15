@@ -206,6 +206,23 @@ table {
   animation: ns-fade-in-side 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Scroll-triggered reveal for sections below the hero (see scroll-reveal.tsx).
+   A transition rather than a keyframe animation: the hero's ns-enter-* rules
+   start automatically at mount, but this one has to sit inert until JS adds
+   .ns-reveal-visible once the block has actually scrolled into view. */
+.ns-reveal {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ns-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Rotating text. Every rotating element runs one infinite animation of the same
    duration; only the keyframe name differs, and that name encodes which slots
    the element is visible for. Because they share a duration and start together,
@@ -257,6 +274,17 @@ table {
        reduced motion and the page settles on whatever language it happens to be
        mid-loop. */
     animation: none !important;
+  }
+
+  /* Scroll reveals show immediately, in place, rather than sliding up when
+     the observer fires — the movement is exactly what this setting asks for
+     less of. The block still starts at opacity 0 in JS-disabled browsers
+     (there's no toggle to add .ns-reveal-visible), so this also covers that
+     case: content must not depend on JS to become visible. */
+  .ns-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 
   /* With the rotation stopped these keep their base opacity, so only the
