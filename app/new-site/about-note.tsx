@@ -1,17 +1,15 @@
 import {
   CONSOLE_LEFT_FROM_RIGHT,
   LEFT_COLUMN,
-  ABOUT_VISIBLE,
+  SIDE_TEXT_VISIBLE,
 } from './console-geometry'
 
 const NAME = 'Diane Stephani'
 
-// Three paragraphs, kept as separate strings so they render as real
-// paragraphs rather than one block with line breaks faked inside it.
+// A single paragraph now, but kept as an array — the render below maps over
+// it — so a future edit back to multiple paragraphs is a one-line change.
 const ABOUT = [
-  `I'm a software engineer with a background in games, and localization is where my heart really is…though I'm always excited to bring that same mindset to new industries and projects! As a kid I was fascinated by linguistics and human language, and learning programming languages felt like a very natural progression.`,
-  `Before I found my way into engineering, I spent most of my professional career bartending and working as a personal trainer. Both of these industries sharpened skills I use every day: reading people, paying close attention to detail, and figuring out what someone actually needs/wants versus what they're asking for.`,
-  `Once I learned software development, I started building tools that solved little problems I ran into on the gym floor or behind the bar. That instinct hasn't changed: I still love building tools that solve the small, real problems people run into. I've been on the ground level as a user myself, and I bring that perspective to how I build and improve the tools we all rely on.`,
+  `I'm a software engineer with a background in games, specializing in localization, though I'm always open to other industries and projects! I work with marketing teams to translate promotional campaigns, and build automation tools to simplify their day-to-day. I also work with other engineers to fix bugs in our games.`,
 ]
 
 // The paragraph wraps, so it only needs a sensible measure — the column less
@@ -28,7 +26,7 @@ const NAME_FONT = `min(2.25rem, calc(${COLUMN} / 6.9))`
 export function AboutNote() {
   return (
     <div
-      className={`pointer-events-none absolute z-10 hidden -translate-y-1/2 [--ns-side-gap:3rem] xl:[--ns-side-gap:4rem] 2xl:[--ns-side-gap:5rem] ${ABOUT_VISIBLE}`}
+      className={`pointer-events-none absolute z-10 hidden -translate-y-1/2 [--ns-side-gap:3rem] xl:[--ns-side-gap:4rem] 2xl:[--ns-side-gap:5rem] ${SIDE_TEXT_VISIBLE}`}
       style={{
         top: '50%',
         // Anchored to the console's left edge, so the gap between the two holds
