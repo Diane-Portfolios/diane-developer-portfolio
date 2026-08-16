@@ -1,14 +1,7 @@
-import Image from 'next/image'
 import { CustomMDX } from '../components/mdx'
 import { formatDate, getBlogPosts } from '../old-site/blog/utils'
 import { ProjectLabel } from './project-label'
 import { ScrollReveal } from './scroll-reveal'
-
-// Intrinsic size passed to Image/img for quality/aspect-ratio — the
-// *displayed* size is set responsively via Tailwind classes at each call
-// site instead (h-9 w-9 sm:h-16 sm:w-16, etc.), so these stay the desktop
-// (sm+) pixel values.
-const THUMB_SIZE = 64
 
 // CSS defines 1in as exactly 96px (the "reference pixel"), independent of the
 // display's real pixel density — it's the standard browsers use to convert
@@ -110,17 +103,17 @@ export async function PillRow({
   return (
     // items-center + a shorter row below sm: the label used to be a
     // same-height absolutely positioned sibling at every width, which only
-    // works when the ball+sprite pairs leave real space clear in the middle
-    // — true on desktop, not on a phone-width screen where they alone were
-    // nearly the full row width. Below sm the label is now a normal flex-1
-    // child instead (see the note on it), so justify-between still applies
-    // but the middle is no longer floating independently over the sprites.
+    // works when the sprites leave real space clear in the middle — true on
+    // desktop, not on a phone-width screen where they alone were nearly the
+    // full row width. Below sm the label is now a normal flex-1 child
+    // instead (see the note on it), so justify-between still applies but
+    // the middle is no longer floating independently over the sprites.
     <div className="relative z-10 flex w-full items-center justify-between">
       {/* The pill. Positioned absolute and centred on the row's own height
           (governed by the sprites, the tallest things in the row — 64px
           below sm, 128px at sm and up) rather than a hardcoded offset, so it
-          stays centred at either size. -z-10 keeps it behind the balls and
-          sprites without them needing their own z-index.
+          stays centred at either size. -z-10 keeps it behind the sprites
+          without them needing their own z-index.
           Translucent white rather than translucent black: the section behind
           it is already pure black, so an actual black fill at any opacity
           would stay black and the pill would disappear. White at low opacity
@@ -131,36 +124,26 @@ export async function PillRow({
         className="absolute inset-x-0 top-1/2 -z-10 h-20 -translate-y-1/2 rounded-full bg-white/15 sm:h-24"
       />
 
-      {/* Left pair: ball then sprite, shifted in from the pill's left edge as
-          a unit — the pill itself stays put. Smaller gap/inset below sm to
-          match the smaller sprites there, so the pair doesn't eat more of a
-          narrow row than it has to. */}
-      <div className="ml-2 flex shrink-0 items-center gap-2 sm:ml-6 sm:gap-4">
-        <Image
-          src="/assets/backgrounds/poke-ball.webp"
-          alt=""
-          aria-hidden
-          width={THUMB_SIZE}
-          height={THUMB_SIZE}
-          className="pointer-events-none h-9 w-9 select-none sm:h-16 sm:w-16"
-        />
-
+      {/* Left sprite, shifted in from the pill's left edge — the pill itself
+          stays put. Smaller inset below sm to match the smaller sprite
+          there, so it doesn't eat more of a narrow row than it has to. */}
+      <div className="ml-4 flex shrink-0 items-center sm:ml-8">
         {leftSpriteUrl && <Sprite src={leftSpriteUrl} flip={flipLeftSprite} />}
       </div>
 
       {/* Room for the project title in the pill's open middle. At sm and up
           this is a separate absolutely positioned sibling, centred on both
-          axes independently of the two ball+sprite pairs — exactly as
+          axes independently of the two flanking sprites — exactly as
           before. Below sm it's a normal flex-1 child instead: absolute
           centring only ever leaves the label clear of the sprites when
           they're small relative to the row, which isn't true on a phone —
           as an in-flow flex child, the space it gets is however much the
-          (now-smaller) ball+sprite pairs don't take, so it can never
-          overlap them regardless of title length. min-w-0 lets it actually
-          shrink to that space instead of flexbox refusing to size it below
-          the unwrapped title's own width. Positioning lives here rather
-          than in the (client) ProjectLabel component so ProjectLabel only
-          has to own the click/modal behaviour. */}
+          (now-smaller) sprites don't take, so it can never overlap them
+          regardless of title length. min-w-0 lets it actually shrink to
+          that space instead of flexbox refusing to size it below the
+          unwrapped title's own width. Positioning lives here rather than in
+          the (client) ProjectLabel component so ProjectLabel only has to
+          own the click/modal behaviour. */}
       {post && (
         <div className="pointer-events-auto min-w-0 flex-1 px-1 text-center sm:absolute sm:left-1/2 sm:top-1/2 sm:flex-none sm:-translate-x-1/2 sm:-translate-y-1/2 sm:px-0">
           <ProjectLabel
@@ -173,22 +156,9 @@ export async function PillRow({
         </div>
       )}
 
-      {/* Right pair: sprite then ball, mirrored — the sprite sits further
-          into the pill ("just inside of" the ball), the ball sits just
-          inside the pill's right edge. flex-row-reverse keeps the ball first
-          in the DOM (so it's the one exposed to justify-between's edge)
-          while rendering it visually last. Plain gap, no tuning — see the
-          note on PillRow. */}
-      <div className="mr-2 flex shrink-0 flex-row-reverse items-center gap-2 sm:mr-6 sm:gap-4">
-        <Image
-          src="/assets/backgrounds/poke-ball.webp"
-          alt=""
-          aria-hidden
-          width={THUMB_SIZE}
-          height={THUMB_SIZE}
-          className="pointer-events-none h-9 w-9 select-none sm:h-16 sm:w-16"
-        />
-
+      {/* Right sprite, mirroring the left one in from the pill's right
+          edge. */}
+      <div className="mr-4 flex shrink-0 items-center sm:mr-8">
         {rightSpriteUrl && <Sprite src={rightSpriteUrl} />}
       </div>
     </div>
@@ -201,10 +171,7 @@ export async function PillRow({
 // right, Experience left, Projects right) now that Projects has its own
 // section again rather than sharing ExperienceSection's row. Each pill's
 // title and subtitle are real project content now (see projectSlug/subtitle
-// on PillRow). The plain, unpaired Poké Balls that used to
-// stack below these (left over from
-// before any pill existed) are gone now that every ball on the page sits
-// inside one.
+// on PillRow).
 export async function ProjectsSection() {
   return (
     // id="projects" is the nav's anchor target; scroll-mt-24 clears the fixed
@@ -231,7 +198,7 @@ export async function ProjectsSection() {
             items-start, and PillRow's own w-full inside it would have
             nothing to be 100% of. items-start still reads as centred — every
             pill is w-full, so cross-axis alignment never actually shows. */}
-        <div className="mt-8 flex flex-col items-start gap-4">
+        <div className="mt-8 flex flex-col items-start gap-8">
           {/* Hisuian Typhlosion (Fire/Ghost) — a distinct PokeAPI entry
               from base Typhlosion, keyed by the "-hisui" regional-form
               suffix, national dex #10233 — paired with Charizard. */}
