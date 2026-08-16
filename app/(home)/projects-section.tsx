@@ -229,7 +229,7 @@ export async function ProjectsSection() {
             items-start, and PillRow's own w-full inside it would have
             nothing to be 100% of. items-start still reads as centred — every
             pill is w-full, so cross-axis alignment never actually shows. */}
-        <div className="mt-8 flex flex-col items-start gap-8">
+        <div className="mt-8 flex flex-col items-start gap-8 sm:gap-4">
           {/* Hisuian Typhlosion (Fire/Ghost) — a distinct PokeAPI entry
               from base Typhlosion, keyed by the "-hisui" regional-form
               suffix, national dex #10233 — paired with Charizard. */}
