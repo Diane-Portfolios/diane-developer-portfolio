@@ -14,6 +14,7 @@ import { LocationNote } from './location-note'
 import { SiteNav } from './nav'
 import { ProjectsSection } from './projects-section'
 import { ROTATION_CSS } from './rotation'
+import { SiteFooter } from './site-footer'
 
 export default function HomePage() {
   return (
@@ -94,6 +95,7 @@ export default function HomePage() {
       <ExperienceSection />
       <ProjectsSection />
       <ContactSection />
+      <SiteFooter />
     </>
   )
 }

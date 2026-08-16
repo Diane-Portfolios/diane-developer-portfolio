@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 import { ScrollReveal } from './scroll-reveal'
 
@@ -60,113 +61,139 @@ export function ContactSection() {
     // Experience/Projects for the same reason — no other padding here
     // happens to already clear the fixed nav.
     <section id="contact" className="relative scroll-mt-24 bg-black">
-      <div className="mx-auto max-w-6xl px-4 pb-32 pt-24 sm:px-6">
-        {/* max-w-xl, no ml-auto — text-left continues the About(right) /
-            Experience(left) / Projects(right) alternation started above. */}
-        <ScrollReveal className="max-w-xl">
+      {/* Background photo + scrim, same treatment as Experience's: the image
+          covers the whole section, and the section's own pb-32 gives the
+          "stop a little ways below the button" clearance rather than the
+          image needing its own hand-measured cutoff — the new SiteFooter
+          right after this section is what picks up once the photo ends. */}
+      <div aria-hidden="true" className="absolute inset-0 z-0">
+        <Image
+          src="/assets/backgrounds/unsplash-switch.jpg"
+          alt=""
+          aria-hidden
+          fill
+          sizes="100vw"
+          className="pointer-events-none select-none object-cover"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-32 pt-24 sm:px-6">
+        <ScrollReveal>
+          {/* Heading stays pinned to the left edge, same as before — only the
+              paragraph and form below it move to the centre now. */}
           <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Contact
           </h2>
-          <p className="mt-6 text-base leading-relaxed text-neutral-400 sm:text-lg">
-            Have a question or want to work together? Send me a message and
-            I'll get back to you as soon as possible.
-          </p>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* mx-auto centres this block in the wide max-w-6xl container,
+              independently of the heading above it. text-center is on the
+              paragraph specifically — the form's own labels/inputs stay
+              left-aligned inside this centred block, which is what "centre
+              the form" means in practice (centering every label over its
+              input would look broken). */}
+          <div className="mx-auto mt-6 max-w-xl">
+            <p className="text-center text-base leading-relaxed text-neutral-400 sm:text-lg">
+              Have a question or want to work together? Send me a message and
+              I'll get back to you as soon as possible.
+            </p>
+
+            <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="firstName"
+                    className="mb-2 block text-sm font-medium text-neutral-300"
+                  >
+                    First Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-white/30 bg-white/15 px-4 py-2 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/40"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="lastName"
+                    className="mb-2 block text-sm font-medium text-neutral-300"
+                  >
+                    Last Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-white/30 bg-white/15 px-4 py-2 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/40"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label
-                  htmlFor="firstName"
+                  htmlFor="email"
                   className="mb-2 block text-sm font-medium text-neutral-300"
                 >
-                  First Name *
+                  Email Address *
                 </label>
                 <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                  className="w-full rounded-lg border border-white/30 bg-white/15 px-4 py-2 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/40"
                 />
               </div>
 
               <div>
                 <label
-                  htmlFor="lastName"
+                  htmlFor="message"
                   className="mb-2 block text-sm font-medium text-neutral-300"
                 >
-                  Last Name *
+                  Message *
                 </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                  rows={6}
+                  className="w-full resize-vertical rounded-lg border border-white/30 bg-white/15 px-4 py-2 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/40"
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-medium text-neutral-300"
+              {status === 'success' && (
+                <div className="rounded-lg bg-green-900/20 p-4 text-green-200">
+                  Thank you for your message! I'll get back to you soon.
+                </div>
+              )}
+
+              {status === 'error' && (
+                <div className="rounded-lg bg-red-900/20 p-4 text-red-200">
+                  {errorMessage}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={status === 'loading'}
+                className="w-full rounded-lg bg-white px-6 py-3 font-medium text-black transition-colors hover:bg-neutral-300 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
               >
-                Email Address *
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/40"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="message"
-                className="mb-2 block text-sm font-medium text-neutral-300"
-              >
-                Message *
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                rows={6}
-                className="w-full resize-vertical rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/40"
-              />
-            </div>
-
-            {status === 'success' && (
-              <div className="rounded-lg bg-green-900/20 p-4 text-green-200">
-                Thank you for your message! I'll get back to you soon.
-              </div>
-            )}
-
-            {status === 'error' && (
-              <div className="rounded-lg bg-red-900/20 p-4 text-red-200">
-                {errorMessage}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="w-full rounded-lg bg-white px-6 py-3 font-medium text-black transition-colors hover:bg-neutral-300 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
-            >
-              {status === 'loading' ? 'Sending...' : 'Send Message'}
-            </button>
-          </form>
+                {status === 'loading' ? 'Sending...' : 'Send Message'}
+              </button>
+            </form>
+          </div>
         </ScrollReveal>
       </div>
     </section>
