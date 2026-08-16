@@ -3,18 +3,20 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
-// The clickable project title in a pill's centre, and the popup it opens.
-// title/dateLabel are plain strings and `children` is the project's MDX
-// content already rendered server-side (CustomMDX is an RSC — it can't run
-// in this client component) — PillRow renders it and passes the result down,
-// same pattern as passing any other Server Component output into a Client
-// Component.
+// The clickable project title (and, at sm and up, subtitle) in a pill's
+// centre, and the popup it opens. title/subtitle/dateLabel are plain strings
+// and `children` is the project's MDX content already rendered server-side
+// (CustomMDX is an RSC — it can't run in this client component) — PillRow
+// renders it and passes the result down, same pattern as passing any other
+// Server Component output into a Client Component.
 export function ProjectLabel({
   title,
+  subtitle,
   dateLabel,
   children,
 }: {
   title: string
+  subtitle?: string
   dateLabel: string
   children: ReactNode
 }) {
@@ -50,6 +52,16 @@ export function ProjectLabel({
         <h3 className="text-sm font-semibold tracking-tight text-white sm:text-lg">
           {title}
         </h3>
+        {/* Hidden below sm rather than always shown: mobile pills are
+            already sized to just fit the title against the (smaller)
+            sprites flanking it — see the note on PillRow's row div — and a
+            second line risks pushing the label taller than the pill
+            capsule behind it on the narrowest screens. */}
+        {subtitle && (
+          <p className="hidden text-sm italic text-neutral-400 sm:mt-1 sm:block">
+            {subtitle}
+          </p>
+        )}
       </button>
 
       {/* Portaled to document.body rather than rendered in place: PillRow's

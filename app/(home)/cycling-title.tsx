@@ -9,10 +9,15 @@ export function CyclingTitle({ className = '' }: { className?: string }) {
   const codes = [...new Set(SEQUENCE)]
 
   return (
-    // items-baseline keeps the name and the role on one baseline even though
-    // the CJK entries have very different metrics from the Latin ones.
+    // Stacked below sm — the role drops to its own line under the name
+    // rather than sharing one, so a long phrase in any language has the
+    // nav's full width to run instead of being squeezed beside the name
+    // and risking an overflow/clip on a narrow phone. From sm up it goes
+    // back to one row, items-baseline keeping the name and the role on one
+    // baseline even though the CJK entries have very different metrics
+    // from the Latin ones.
     <span
-      className={`inline-flex items-baseline whitespace-nowrap ${className}`}
+      className={`flex flex-col items-start whitespace-normal sm:inline-flex sm:flex-row sm:items-baseline sm:whitespace-nowrap ${className}`}
     >
       {/* Rendered once, outside the stack. It is not part of any animation and
           nothing to its right can resize it, so it cannot move. */}

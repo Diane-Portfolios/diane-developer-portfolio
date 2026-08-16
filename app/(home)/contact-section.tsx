@@ -4,10 +4,11 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { ScrollReveal } from './scroll-reveal'
 
-// Same form as the old site's /old-site/contact — same fields, same POST to
-// /api/contact, same status handling — restyled for this page's permanently
-// dark theme rather than the old page's light/dark toggle (there's no light
-// mode here, so no dark: variants needed).
+// Same form as the old site's contact page (now removed, superseded by this
+// section) — same fields, same POST to /api/contact, same status handling —
+// restyled for this page's permanently dark theme rather than the old page's
+// light/dark toggle (there's no light mode here, so no dark: variants
+// needed).
 export function ContactSection() {
   const [formData, setFormData] = useState({
     firstName: '',

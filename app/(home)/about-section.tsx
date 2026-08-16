@@ -19,39 +19,34 @@ export function AboutSection() {
           scroll-mt-24 already covering nav clearance, that padding was pure
           black space between the hero and this section's own content. */}
       <div className="mx-auto max-w-6xl px-4 pb-24 pt-8 sm:px-6 lg:pt-16">
-        {/* ml-auto pushes the group to the right within the wide container,
-            same as before. Now a row rather than a single column: the Steam
-            capsule art sits to the left of the heading/paragraph,
-            items-center aligns the two evenly on the shared vertical centre
-            rather than by their tops. Stacked (flex-col) below lg — a row
-            this wide would otherwise force the photo down to a sliver.
-            Wrapped in ScrollReveal rather than animating on mount (like the
-            hero) — this section starts off-screen below the fold, so its
-            entrance should fire when the visitor actually scrolls to it. */}
-        <ScrollReveal className="ml-auto flex w-fit flex-col items-center gap-8 lg:flex-row">
+        {/* about-layout (see globals.css) is a CSS Grid with named areas: the
+            photo sits between the heading and paragraph in one column below
+            lg, then moves to their left beside a two-row text column at lg
+            — see the comment on .about-layout for why this needs grid areas
+            rather than plain flex. ml-auto pushes the whole grid right
+            within this wide container, same as before — needs the grid's
+            own width to be definite for ml-auto to have anything to push
+            within, which .about-layout's own width:fit-content/max-width
+            provide. Wrapped in ScrollReveal rather than animating on mount
+            (like the hero) — this section starts off-screen below the
+            fold, so its entrance should fire when the visitor actually
+            scrolls to it. */}
+        <ScrollReveal className="about-layout ml-auto">
+          <h2 className="about-title text-right text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            About
+          </h2>
+
           <Image
             src="/assets/backgrounds/swapmeat-steam.jpg"
             alt="Swap Meat on Steam"
             width={460}
             height={215}
-            // w-[460px], not w-full max-w-[460px]: the parent ScrollReveal is
-            // w-fit (sized to its own content) so it has no width of its own
-            // to be a percentage *of* — w-full there resolves against
-            // nothing meaningful and the image ends up smaller than
-            // intended. An explicit width sidesteps that; max-w-full is just
-            // the narrow-viewport fallback so it can still shrink on a
-            // phone.
-            className="w-[460px] max-w-full rounded-lg"
+            className="about-photo w-[460px] max-w-full rounded-lg"
           />
 
-          <div className="max-w-xl text-right">
-            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              About
-            </h2>
-            <p className="mt-6 text-base leading-relaxed text-neutral-500 sm:text-lg">
-              {ABOUT_PARAGRAPH}
-            </p>
-          </div>
+          <p className="about-para text-right text-base leading-relaxed text-neutral-500 sm:text-lg">
+            {ABOUT_PARAGRAPH}
+          </p>
         </ScrollReveal>
       </div>
     </section>

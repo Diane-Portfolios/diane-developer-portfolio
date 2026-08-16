@@ -28,6 +28,29 @@ describe('ProjectLabel', () => {
     expect(screen.queryByText('Wonderbot is an automation workflow.')).not.toBeInTheDocument()
   })
 
+  it('renders the subtitle inside the trigger button when given', () => {
+    render(
+      <ProjectLabel
+        title="Wonderbot-1000"
+        subtitle="An automated social media scraper"
+        dateLabel="May 27, 2026"
+      >
+        <p>content</p>
+      </ProjectLabel>
+    )
+    const subtitle = screen.getByText('An automated social media scraper')
+    expect(subtitle.closest('button')).toHaveAccessibleName(/Wonderbot-1000/)
+  })
+
+  it('renders no subtitle text at all when none is given', () => {
+    setup()
+    // Nothing else to assert against by content, so just confirm the trigger
+    // button holds only the title's own text node.
+    expect(screen.getByRole('button', { name: 'Wonderbot-1000' }).textContent).toBe(
+      'Wonderbot-1000'
+    )
+  })
+
   it('opens the modal on click, showing the title, date, and content', async () => {
     const { user } = setup()
     await user.click(screen.getByRole('button', { name: 'Wonderbot-1000' }))

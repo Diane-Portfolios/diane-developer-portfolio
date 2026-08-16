@@ -47,6 +47,10 @@ html {
    rather than a class. */
 :root {
   --console-max-w: 122vw;
+  /* Below lg the hero also stacks the About/location text above the
+     console (see page.tsx), so the console can no longer claim the whole
+     screen height the way it could when it was the hero's only content. */
+  --console-max-h: 42vh;
 }
 
 @media (min-width: 1024px) {
@@ -56,6 +60,52 @@ html {
        SIZE) — at full hero height (73vh) it dwarfed the text column beside
        it; a smaller console reads as a more even match for it. */
     --console-max-h: 58vh;
+  }
+}
+
+/* About section (see about-section.tsx): below lg the photo sits *between*
+   the heading and the paragraph in one stacked column; at lg it moves to
+   their *left*, beside a two-row text column instead. That's a reshuffle
+   from 3 stacked items into 1-beside-2, which plain flexbox `order` can't
+   express — order only resequences items within a single row/column, it
+   can't regroup them. Named grid areas just say where each piece sits at
+   each breakpoint, with no wrapper/duplication needed. */
+.about-layout {
+  display: grid;
+  grid-template-areas: 'title' 'photo' 'para';
+  row-gap: 1.5rem;
+  /* Matches Tailwind's max-w-xl. width:fit-content (not the default auto)
+     so unused space doesn't sit inside the box — the box needs to actually
+     shrink to its content for the column's own ml-auto to have anything to
+     push right within. */
+  width: fit-content;
+  max-width: 36rem;
+  justify-items: end;
+}
+
+.about-title {
+  grid-area: title;
+}
+
+.about-photo {
+  grid-area: photo;
+}
+
+.about-para {
+  grid-area: para;
+}
+
+@media (min-width: 1024px) {
+  .about-layout {
+    grid-template-columns: auto 36rem;
+    grid-template-areas: 'photo title' 'photo para';
+    column-gap: 2rem;
+    align-items: center;
+    max-width: none;
+    /* title/para should fill their 36rem column so text-right lands on the
+       column's true right edge, not wherever their own content happens to
+       end. */
+    justify-items: stretch;
   }
 }
 

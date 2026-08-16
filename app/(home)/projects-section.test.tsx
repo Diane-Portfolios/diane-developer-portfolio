@@ -45,10 +45,27 @@ describe('PillRow', () => {
       leftPokemon: 'typhlosion-hisui',
       rightPokemon: 'charizard',
       projectSlug: 'wonderbot-1000',
+      subtitle: 'An automated social media scraper',
     })
     render(element)
 
-    expect(screen.getByRole('button', { name: 'Wonderbot-1000' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Wonderbot-1000/ })).toBeInTheDocument()
+    expect(screen.getByText('An automated social media scraper')).toBeInTheDocument()
+  })
+
+  it('uses titleOverride for display instead of the post\'s own frontmatter title, when given', async () => {
+    const element = await PillRow({
+      leftPokemon: 'ceruledge',
+      rightPokemon: 'milotic',
+      flipLeftSprite: true,
+      projectSlug: 'playswapmeat',
+      titleOverride: 'Playswapmeat.com',
+      subtitle: 'Marketing website for Swapmeat, by One More Game',
+    })
+    render(element)
+
+    expect(screen.getByRole('button', { name: /Playswapmeat\.com/ })).toBeInTheDocument()
+    expect(screen.queryByText('Playswapmeat', { selector: 'h3' })).not.toBeInTheDocument()
   })
 
   it('fetches and renders both official-artwork sprites, flipping only the left one when asked', async () => {
@@ -57,6 +74,7 @@ describe('PillRow', () => {
       rightPokemon: 'milotic',
       flipLeftSprite: true,
       projectSlug: 'playswapmeat',
+      subtitle: 'Marketing website for Swapmeat, by One More Game',
     })
     const { container } = render(element)
 
@@ -67,6 +85,28 @@ describe('PillRow', () => {
     const right = container.querySelector('img[src*="milotic"]') as HTMLElement
     expect(left.style.transform).toBe('scaleX(-1)')
     expect(right.style.transform).toBe('')
+  })
+
+  it('renders both Poké Ball icons hidden below sm (visible again from sm up), alongside both sprites', async () => {
+    const element = await PillRow({
+      leftPokemon: 'typhlosion-hisui',
+      rightPokemon: 'charizard',
+      projectSlug: 'wonderbot-1000',
+      subtitle: 'An automated social media scraper',
+    })
+    const { container } = render(element)
+
+    // jsdom doesn't evaluate media queries, so "hidden below sm" is checked
+    // via the classes themselves rather than a computed/visible style.
+    const balls = container.querySelectorAll('img[src*="poke-ball"]')
+    expect(balls).toHaveLength(2)
+    for (const ball of balls) {
+      expect(ball).toHaveClass('hidden')
+      expect(ball).toHaveClass('sm:block')
+    }
+
+    expect(container.querySelectorAll('img[src*="/sprites/"]')).toHaveLength(2)
+    expect(container.querySelectorAll('img')).toHaveLength(4)
   })
 
   it('renders without a sprite (but without crashing) when PokeAPI fails for one side', async () => {
@@ -84,6 +124,7 @@ describe('PillRow', () => {
       leftPokemon: 'nonexistent-pokemon',
       rightPokemon: 'charizard',
       projectSlug: 'wonderbot-1000',
+      subtitle: 'An automated social media scraper',
     })
     const { container } = render(element)
 
@@ -96,6 +137,7 @@ describe('PillRow', () => {
       leftPokemon: 'typhlosion-hisui',
       rightPokemon: 'charizard',
       projectSlug: 'not-a-real-post',
+      subtitle: 'An automated social media scraper',
     })
     render(element)
 
@@ -135,6 +177,24 @@ describe('ProjectsSection composition', () => {
       'laango-django',
       'apre-method',
     ])
+  })
+
+  it('wires up the requested subtitle for each pill, and the title override for Playswapmeat.com', async () => {
+    const element = await ProjectsSection()
+    const pillRows = findAllByType(element, PillRow)
+    const bySlug = Object.fromEntries(pillRows.map((row) => [row.props.projectSlug, row.props]))
+
+    expect(bySlug['wonderbot-1000'].subtitle).toBe('An automated social media scraper')
+    expect(bySlug['playswapmeat'].subtitle).toBe(
+      'Marketing website for Swapmeat, by One More Game'
+    )
+    expect(bySlug['playswapmeat'].titleOverride).toBe('Playswapmeat.com')
+    expect(bySlug['house-ops'].subtitle).toBe('Automated household manager')
+    expect(bySlug['moonbob-money'].subtitle).toBe('I created crypto and named it after my cat')
+    expect(bySlug['laango-django'].subtitle).toBe(
+      'A scheduling service for translation and interpreting agencies'
+    )
+    expect(bySlug['apre-method'].subtitle).toBe('A calculated approach to progressive overload')
   })
 
   it('flips the same left sprites that were deliberately flipped for facing/alignment', async () => {

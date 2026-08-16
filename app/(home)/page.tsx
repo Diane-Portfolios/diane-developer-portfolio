@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import type { CSSProperties } from 'react'
 import { CONSOLE_BOTTOM_INSET, SCREEN_Y_OFFSET, SIZE } from './console-geometry'
 import { AboutNote } from './about-note'
 import { AboutSection } from './about-section'
@@ -30,13 +31,19 @@ export default function HomePage() {
           scroll-margin-top on it (unlike the sections below), since the hero
           already starts at the literal top of the page and the fixed nav is
           *meant* to overlay its first ~90px rather than be cleared. */}
-      <section id="home" className="relative h-screen overflow-hidden bg-black">
+      <section id="home" className="relative min-h-screen overflow-hidden bg-black lg:h-screen">
         {/* The photo runs from the very top of the hero — the opaque navbar
             covers its first ~90px, so it still reads as starting beneath the
-            nav without the layout having to know how tall the nav is. */}
+            nav without the layout having to know how tall the nav is.
+            Below lg the hero's height now grows with its stacked content
+            (see the grid below) rather than staying pinned to exactly one
+            viewport, so CONSOLE_BOTTOM_INSET — which assumes the console
+            sits at the literal viewport centre — only holds at lg and up;
+            below that the photo simply runs the full height of its section
+            via the plain bottom-0 fallback. */}
         <div
-          className="absolute inset-x-0 top-0 z-0"
-          style={{ bottom: CONSOLE_BOTTOM_INSET }}
+          className="absolute inset-x-0 top-0 z-0 bottom-0 lg:bottom-[var(--hero-photo-bottom)]"
+          style={{ '--hero-photo-bottom': CONSOLE_BOTTOM_INSET } as CSSProperties}
         >
           <Image
             src="/assets/backgrounds/unsplash-controller.jpg"
@@ -58,27 +65,33 @@ export default function HomePage() {
         {/* 2 columns at lg (1024px) and up: About + the work-location note
             stacked on the left, the console centred on its own on the right —
             place-items-center centres each grid item within its own cell on
-            both axes. Below lg it's grid-cols-1: the left column (hidden
-            below lg) drops out of layout entirely, leaving the console as
-            the grid's only item, centred on the full width exactly as
-            before. One console, rendered once — its position comes from
-            which grid it's sitting in, not from two copies of its markup.
+            both axes. Below lg it's grid-cols-1, so the same two grid items
+            just stack top to bottom instead of sitting side by side — text
+            first (see DOM order below), console second — with the section's
+            height growing to fit rather than clipping either one. One
+            console, rendered once — its position comes from which grid it's
+            sitting in, not from two copies of its markup.
             lg:-translate-x-[5%]: with equal 50/50 columns, the console
             (centred in the right half) sits at 75% of the viewport while the
             text (pulled to the gutter) sits just left of centre — so the
             pair's actual midpoint lands well right of centre. Nudging the
             whole grid left re-centres that midpoint without touching either
             column's own alignment or the gap between them. */}
-        <div className="relative z-10 grid h-full grid-cols-1 place-items-center lg:grid-cols-2 lg:gap-x-6 lg:-translate-x-[5%] xl:gap-x-10">
-          {/* items-start (not -center): the text inside is left-aligned now,
-              so the column itself should hug that same left edge rather than
-              centring a left-aligned block. lg:justify-self-end pulls the
-              whole column to the right edge of its grid cell — the side
-              nearest the console — since a left-aligned block would
-              otherwise drift toward the *outer* edge of the viewport instead
-              of the gutter, working against wanting it closer to the console
-              rather than farther. */}
-          <div className="hidden flex-col items-start gap-10 lg:flex lg:justify-self-end">
+        <div className="relative z-10 grid grid-cols-1 place-items-center gap-y-10 px-6 pb-14 pt-44 lg:h-full lg:grid-cols-2 lg:gap-x-6 lg:gap-y-0 lg:-translate-x-[5%] lg:px-0 lg:pb-0 lg:pt-0 xl:gap-x-10">
+          {/* justify-self-start pins this block to the left edge of the
+              grid cell instead of the grid's own place-items-center default
+              — below lg the name should sit flush against the screen's left
+              edge (matching the rest of the site's left/right-aligned
+              sections) rather than centred as an island in the middle. At lg
+              and up that flips to justify-self-end, pulling the whole column
+              to the right edge of its cell — the side nearest the console —
+              since it would otherwise drift toward the *outer* edge of the
+              viewport instead of the gutter, working against wanting it
+              closer to the console rather than farther. items-start (not
+              -center) matches: the text inside is left-aligned, so the
+              column itself should hug that same left edge rather than
+              centring a left-aligned block. */}
+          <div className="flex flex-col items-start justify-self-start gap-6 lg:gap-10 lg:justify-self-end">
             <AboutNote />
             <LocationNote />
           </div>
