@@ -33,12 +33,18 @@ export function SiteNav() {
       {/* The whole row fades in together — the rotating title included, now
           that a slot runs long enough for the entrance not to eat into it. */}
       <div className="ns-enter-nav mx-auto flex max-w-6xl flex-col gap-1 px-4 pb-4 pt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
-        <div className="-ml-[8px] flex flex-row">
+        {/* Tighter margin/padding/text below sm: at the default size all 5
+            links ran wider than a narrow phone screen and clipped past the
+            edge. flex-wrap as a last resort, not the primary fix — the
+            tighter sizing already fits every phone width tested; wrap just
+            means an unusually large system font never re-introduces the
+            clip. */}
+        <div className="-ml-1.5 flex flex-row flex-wrap sm:-ml-[8px] sm:flex-nowrap">
           {SITE_NAV_ITEMS.map(({ id, name }) => (
             <a
               key={id}
               href={`#${id}`}
-              className="relative m-1 flex px-2 py-1 align-middle text-white transition-all hover:text-neutral-400"
+              className="relative m-0.5 flex px-1.5 py-1 align-middle text-sm text-white transition-all hover:text-neutral-400 sm:m-1 sm:px-2 sm:text-base"
             >
               {name}
             </a>

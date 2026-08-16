@@ -38,6 +38,27 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Feeds the console's width limit in console-geometry.ts (SIZE). Below lg the
+   hero is a single column and the console is sized off the full viewport
+   width; at lg (1024px) and up it moves into its own half of a 2-column
+   layout, so it only has roughly half the viewport to work with. A plain CSS
+   custom property is the only way to express that "different value above a
+   breakpoint" for a number that's consumed by a JS-computed inline style
+   rather than a class. */
+:root {
+  --console-max-w: 122vw;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --console-max-w: 40vw;
+    /* Also caps the console's height at lg+ (see console-geometry.ts's
+       SIZE) — at full hero height (73vh) it dwarfed the text column beside
+       it; a smaller console reads as a more even match for it. */
+    --console-max-h: 58vh;
+  }
+}
+
 .prose .anchor {
   @apply absolute invisible no-underline;
 

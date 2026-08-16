@@ -4,6 +4,10 @@ import { formatDate, getBlogPosts } from '../old-site/blog/utils'
 import { ProjectLabel } from './project-label'
 import { ScrollReveal } from './scroll-reveal'
 
+// Intrinsic size passed to Image/img for quality/aspect-ratio — the
+// *displayed* size is set responsively via Tailwind classes at each call
+// site instead (h-9 w-9 sm:h-16 sm:w-16, etc.), so these stay the desktop
+// (sm+) pixel values.
 const THUMB_SIZE = 64
 
 // CSS defines 1in as exactly 96px (the "reference pixel"), independent of the
@@ -11,15 +15,6 @@ const THUMB_SIZE = 64
 // physical units, so it's the correct way to target "an inch" in code. 128px
 // = 1.33in, comfortably past the 96px/1in floor.
 const SPRITE_SIZE = 128
-
-// Shorter than both sprites, taller than the balls: 16px of padding around
-// each ball, and 16px of each sprite poking out past the pill on top and
-// bottom — both sprites are the same size, so this holds symmetrically.
-const PILL_HEIGHT = 96
-
-// How far each outer ball sits from its edge of the pill, in every row.
-const LEFT_INSET = 24
-const RIGHT_INSET = 24
 
 async function getPokemonSprites(name: string) {
   try {
@@ -59,16 +54,19 @@ function Sprite({
       aria-hidden="true"
       width={SPRITE_SIZE}
       height={SPRITE_SIZE}
-      className="pointer-events-none select-none"
+      // Half size below sm: two of these plus two balls at full size left
+      // almost no room for the title between them on a phone-width screen —
+      // see the note on the row below.
+      className="pointer-events-none h-16 w-16 select-none sm:h-32 sm:w-32"
       style={flip ? { transform: 'scaleX(-1)' } : undefined}
     />
   )
 }
 
 // One ball+sprite+ball+sprite row on a pill — the template. Every row uses
-// the same plain gap-4 spacing on both sides, so the left-hand sprites line
-// up in a consistent column down the page regardless of what each one's own
-// bounding box looks like — no per-Pokémon margin tuning.
+// the same plain gap on both sides (responsive, but never per-Pokémon-tuned),
+// so the left-hand sprites line up in a consistent column down the page
+// regardless of what each one's own bounding box looks like.
 //
 // projectSlug looks the post up from the old site's own blog posts
 // (app/old-site/blog/posts/*.mdx) via the same getBlogPosts() that site
@@ -101,12 +99,19 @@ export async function PillRow({
   const post = getBlogPosts().find((p) => p.slug === projectSlug)
 
   return (
+    // items-center + a shorter row below sm: the label used to be a
+    // same-height absolutely positioned sibling at every width, which only
+    // works when the ball+sprite pairs leave real space clear in the middle
+    // — true on desktop, not on a phone-width screen where they alone were
+    // nearly the full row width. Below sm the label is now a normal flex-1
+    // child instead (see the note on it), so justify-between still applies
+    // but the middle is no longer floating independently over the sprites.
     <div className="relative z-10 flex w-full items-center justify-between">
       {/* The pill. Positioned absolute and centred on the row's own height
-          (governed by the 128px sprites, the tallest things in the row)
-          rather than a hardcoded offset, so it stays centred if that height
-          ever changes. -z-10 keeps it behind the balls and sprites without
-          them needing their own z-index.
+          (governed by the sprites, the tallest things in the row — 64px
+          below sm, 128px at sm and up) rather than a hardcoded offset, so it
+          stays centred at either size. -z-10 keeps it behind the balls and
+          sprites without them needing their own z-index.
           Translucent white rather than translucent black: the section behind
           it is already pure black, so an actual black fill at any opacity
           would stay black and the pill would disappear. White at low opacity
@@ -114,33 +119,41 @@ export async function PillRow({
           against a black backdrop. */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-1/2 -z-10 -translate-y-1/2 rounded-full bg-white/15"
-        style={{ height: PILL_HEIGHT }}
+        className="absolute inset-x-0 top-1/2 -z-10 h-20 -translate-y-1/2 rounded-full bg-white/15 sm:h-24"
       />
 
       {/* Left pair: ball then sprite, shifted in from the pill's left edge as
-          a unit — the pill itself stays put. */}
-      <div className="flex items-center gap-4" style={{ marginLeft: LEFT_INSET }}>
+          a unit — the pill itself stays put. Smaller gap/inset below sm to
+          match the smaller sprites there, so the pair doesn't eat more of a
+          narrow row than it has to. */}
+      <div className="ml-2 flex shrink-0 items-center gap-2 sm:ml-6 sm:gap-4">
         <Image
           src="/assets/backgrounds/poke-ball.webp"
           alt=""
           aria-hidden
           width={THUMB_SIZE}
           height={THUMB_SIZE}
-          className="pointer-events-none select-none"
+          className="pointer-events-none h-9 w-9 select-none sm:h-16 sm:w-16"
         />
 
         {leftSpriteUrl && <Sprite src={leftSpriteUrl} flip={flipLeftSprite} />}
       </div>
 
-      {/* Room for the project title in the pill's open middle, centred on
-          both axes independently of the two ball+sprite pairs (which are
-          flex children of this row; this is a separate absolutely positioned
-          sibling, so it can't be pushed around by their widths). Positioning
-          lives here rather than in the (client) ProjectLabel component so
-          ProjectLabel only has to own the click/modal behaviour. */}
+      {/* Room for the project title in the pill's open middle. At sm and up
+          this is a separate absolutely positioned sibling, centred on both
+          axes independently of the two ball+sprite pairs — exactly as
+          before. Below sm it's a normal flex-1 child instead: absolute
+          centring only ever leaves the label clear of the sprites when
+          they're small relative to the row, which isn't true on a phone —
+          as an in-flow flex child, the space it gets is however much the
+          (now-smaller) ball+sprite pairs don't take, so it can never
+          overlap them regardless of title length. min-w-0 lets it actually
+          shrink to that space instead of flexbox refusing to size it below
+          the unwrapped title's own width. Positioning lives here rather
+          than in the (client) ProjectLabel component so ProjectLabel only
+          has to own the click/modal behaviour. */}
       {post && (
-        <div className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="pointer-events-auto min-w-0 flex-1 px-1 text-center sm:absolute sm:left-1/2 sm:top-1/2 sm:flex-none sm:-translate-x-1/2 sm:-translate-y-1/2 sm:px-0">
           <ProjectLabel title={post.metadata.title} dateLabel={formatDate(post.metadata.publishedAt)}>
             <CustomMDX source={post.content} />
           </ProjectLabel>
@@ -151,19 +164,16 @@ export async function PillRow({
           into the pill ("just inside of" the ball), the ball sits just
           inside the pill's right edge. flex-row-reverse keeps the ball first
           in the DOM (so it's the one exposed to justify-between's edge)
-          while rendering it visually last. Plain gap-4, no tuning — see the
+          while rendering it visually last. Plain gap, no tuning — see the
           note on PillRow. */}
-      <div
-        className="flex flex-row-reverse items-center gap-4"
-        style={{ marginRight: RIGHT_INSET }}
-      >
+      <div className="mr-2 flex shrink-0 flex-row-reverse items-center gap-2 sm:mr-6 sm:gap-4">
         <Image
           src="/assets/backgrounds/poke-ball.webp"
           alt=""
           aria-hidden
           width={THUMB_SIZE}
           height={THUMB_SIZE}
-          className="pointer-events-none select-none"
+          className="pointer-events-none h-9 w-9 select-none sm:h-16 sm:w-16"
         />
 
         {rightSpriteUrl && <Sprite src={rightSpriteUrl} />}

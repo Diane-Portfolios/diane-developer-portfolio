@@ -1,10 +1,5 @@
 import Image from 'next/image'
-import {
-  CONSOLE_BOTTOM_INSET,
-  SCREEN_CENTRE_X,
-  SCREEN_CENTRE_Y,
-  SIZE,
-} from './console-geometry'
+import { CONSOLE_BOTTOM_INSET, SCREEN_Y_OFFSET, SIZE } from './console-geometry'
 import { AboutNote } from './about-note'
 import { AboutSection } from './about-section'
 import { ContactSection } from './contact-section'
@@ -60,33 +55,47 @@ export default function HomePage() {
           <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
         </div>
 
-        <AboutNote />
-        <LocationNote />
+        {/* 2 columns at lg (1024px) and up: About + the work-location note
+            stacked on the left, the console centred on its own on the right —
+            place-items-center centres each grid item within its own cell on
+            both axes. Below lg it's grid-cols-1: the left column (hidden
+            below lg) drops out of layout entirely, leaving the console as
+            the grid's only item, centred on the full width exactly as
+            before. One console, rendered once — its position comes from
+            which grid it's sitting in, not from two copies of its markup. */}
+        <div className="relative z-10 grid h-full grid-cols-1 place-items-center lg:grid-cols-2 lg:gap-x-12 xl:gap-x-24">
+          <div className="hidden flex-col items-center gap-10 lg:flex">
+            <AboutNote />
+            <LocationNote />
+          </div>
 
-        {/* Positioned against the hero, which is exactly one viewport tall, so
-            top-1/2 still resolves to the middle of the screen on load. */}
-        <div
-          className="absolute left-1/2 top-1/2 z-10"
-          style={{
-            height: SIZE,
-            aspectRatio: '812 / 1046',
-            transform: `translate(-${SCREEN_CENTRE_X}%, -${SCREEN_CENTRE_Y}%)`,
-          }}
-        >
-          {/* The entrance animation lives here rather than on the image so the
-              screen fades and scales in locked to the console. On the image alone
-              the video would sit still while the console moved under it. */}
-          <div className="ns-enter-gameboy relative h-full w-full">
-            <Image
-              src="/assets/backgrounds/gameboy.png"
-              alt=""
-              aria-hidden
-              width={812}
-              height={1046}
-              priority
-              className="pointer-events-none h-full w-full select-none"
-            />
-            <GameBoyScreen />
+          {/* SCREEN_Y_OFFSET nudges the box down from place-items-center's
+              plain geometric centring, so the *screen* — not the image's own
+              midpoint — lands at the centre of the cell. */}
+          <div
+            className="relative"
+            style={{
+              height: SIZE,
+              aspectRatio: '812 / 1046',
+              transform: `translateY(${SCREEN_Y_OFFSET}%)`,
+            }}
+          >
+            {/* The entrance animation lives on this inner wrapper rather than
+                the sized box above so it can't clobber that box's own
+                transform (the Y-offset nudge). On the image alone the video
+                would sit still while the console moved under it. */}
+            <div className="ns-enter-gameboy relative h-full w-full">
+              <Image
+                src="/assets/backgrounds/gameboy.png"
+                alt=""
+                aria-hidden
+                width={812}
+                height={1046}
+                priority
+                className="pointer-events-none h-full w-full select-none"
+              />
+              <GameBoyScreen />
+            </div>
           </div>
         </div>
       </section>
