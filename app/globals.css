@@ -31,6 +31,11 @@
 
 html {
   min-width: 360px;
+  /* The homepage nav scrolls to in-page sections (#about, #experience, etc.)
+     via plain <a href="#..."> rather than any JS scroll call, so this is what
+     makes those jumps glide instead of snapping instantly. Turned back off
+     under prefers-reduced-motion below. */
+  scroll-behavior: smooth;
 }
 
 .prose .anchor {
@@ -119,6 +124,31 @@ html {
   /* Override removing top margin, causing layout shift */
   margin-top: 1.25em !important;
   margin-bottom: 1.25em !important;
+}
+
+/* .prose's colors above follow the *system's* prefers-color-scheme via its
+   dark: variants, which is correct for the old site (it actually supports
+   light mode). The homepage's project modal is always dark regardless of
+   system preference, so on a light-mode system .prose's un-prefixed (light-
+   mode) colors would apply against the modal's dark panel — e.g. .prose p's
+   text-neutral-800 read at low contrast on black, and .prose pre's
+   bg-neutral-50 would render as a near-white code block. Pairing this class
+   alongside .prose forces the same colors the dark: variants would give,
+   unconditionally. */
+.prose-invert.prose a {
+  @apply decoration-neutral-600;
+}
+
+.prose-invert.prose .anchor:after {
+  @apply text-neutral-700;
+}
+
+.prose-invert.prose pre {
+  @apply bg-neutral-900 border-neutral-900;
+}
+
+.prose-invert.prose p {
+  @apply text-neutral-200;
 }
 
 pre::-webkit-scrollbar {
@@ -263,6 +293,12 @@ table {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    /* Anchor-nav jumps snap instantly instead of gliding — a multi-section
+       scroll animation is exactly the motion this setting asks to remove. */
+    scroll-behavior: auto;
+  }
+
   .ns-enter-nav,
   .ns-enter-gameboy,
   .ns-enter-side,

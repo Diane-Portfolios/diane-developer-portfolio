@@ -1,5 +1,5 @@
 import { baseUrl } from '../sitemap'
-import { getBlogPosts } from '../(portfolio)/blog/utils'
+import { getBlogPosts } from '../old-site/blog/utils'
 
 export async function GET() {
   let allBlogs = await getBlogPosts()
@@ -15,7 +15,7 @@ export async function GET() {
       (post) =>
         `<item>
           <title>${post.metadata.title}</title>
-          <link>${baseUrl}/blog/${post.slug}</link>
+          <link>${baseUrl}/old-site/blog/${post.slug}</link>
           <description>${post.metadata.summary || ''}</description>
           <pubDate>${new Date(
             post.metadata.publishedAt
