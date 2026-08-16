@@ -1,4 +1,7 @@
 import Image from 'next/image'
+import { CustomMDX } from '../components/mdx'
+import { formatDate, getBlogPosts } from '../old-site/blog/utils'
+import { ProjectLabel } from './project-label'
 import { ScrollReveal } from './scroll-reveal'
 
 const THUMB_SIZE = 64
@@ -62,35 +65,27 @@ function Sprite({
   )
 }
 
-// PLACEHOLDER — replace with a real project name and one-line description.
-// Not a link yet since there's nowhere for it to go; swap the wrapping div for
-// a Link once project pages exist. The hover glow already behaves like a real
-// clickable element so the transition to an actual link is purely mechanical.
-function ProjectLabel() {
-  return (
-    <div
-      className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer text-center transition-all duration-300 ease-out hover:scale-105 hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.75)]"
-    >
-      <h3 className="text-lg font-semibold tracking-tight text-white">
-        Project Name
-      </h3>
-      <p className="mt-1 text-sm italic text-neutral-400">Subtitle</p>
-    </div>
-  )
-}
-
 // One ball+sprite+ball+sprite row on a pill — the template. Every row uses
 // the same plain gap-4 spacing on both sides, so the left-hand sprites line
 // up in a consistent column down the page regardless of what each one's own
 // bounding box looks like — no per-Pokémon margin tuning.
+//
+// projectSlug looks the post up from the old site's own blog posts
+// (app/old-site/blog/posts/*.mdx) via the same getBlogPosts() that site
+// still uses — one real source of content instead of a second copy. Only the
+// title renders in the pill itself for now (no subtitle yet); the full
+// post — same title, date, and MDX body the old blog page rendered — opens
+// in ProjectLabel's popup on click.
 async function PillRow({
   leftPokemon,
   rightPokemon,
   flipLeftSprite,
+  projectSlug,
 }: {
   leftPokemon: string
   rightPokemon: string
   flipLeftSprite?: boolean
+  projectSlug: string
 }) {
   const [leftSprites, rightSprites] = await Promise.all([
     getPokemonSprites(leftPokemon),
@@ -98,6 +93,8 @@ async function PillRow({
   ])
   const leftSpriteUrl = leftSprites?.other?.['official-artwork']?.front_default ?? null
   const rightSpriteUrl = rightSprites?.other?.['official-artwork']?.front_default ?? null
+
+  const post = getBlogPosts().find((p) => p.slug === projectSlug)
 
   return (
     <div className="relative z-10 flex w-full items-center justify-between">
@@ -132,11 +129,19 @@ async function PillRow({
         {leftSpriteUrl && <Sprite src={leftSpriteUrl} flip={flipLeftSprite} />}
       </div>
 
-      {/* Room for a project name + subtitle in the pill's open middle,
-          centred on both axes independently of the two ball+sprite pairs
-          (which are flex children of this row; this is a separate absolutely
-          positioned sibling, so it can't be pushed around by their widths). */}
-      <ProjectLabel />
+      {/* Room for the project title in the pill's open middle, centred on
+          both axes independently of the two ball+sprite pairs (which are
+          flex children of this row; this is a separate absolutely positioned
+          sibling, so it can't be pushed around by their widths). Positioning
+          lives here rather than in the (client) ProjectLabel component so
+          ProjectLabel only has to own the click/modal behaviour. */}
+      {post && (
+        <div className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <ProjectLabel title={post.metadata.title} dateLabel={formatDate(post.metadata.publishedAt)}>
+            <CustomMDX source={post.content} />
+          </ProjectLabel>
+        </div>
+      )}
 
       {/* Right pair: sprite then ball, mirrored — the sprite sits further
           into the pill ("just inside of" the ball), the ball sits just
@@ -167,9 +172,11 @@ async function PillRow({
 // ExperienceSection, with the "Projects" title right above the first pill —
 // text-right to keep the About/Experience/Projects alternation going (About
 // right, Experience left, Projects right) now that Projects has its own
-// section again rather than sharing ExperienceSection's row. Real project
-// entries replace the placeholder labels once there's something to show. The
-// plain, unpaired Poké Balls that used to stack below these (left over from
+// section again rather than sharing ExperienceSection's row. Each pill's
+// title is real project content now (see projectSlug on PillRow); only the
+// titles show here so far, ordered to match what was asked for — a subtitle
+// per project can follow later. The plain, unpaired Poké Balls that used to
+// stack below these (left over from
 // before any pill existed) are gone now that every ball on the page sits
 // inside one.
 export async function ProjectsSection() {
@@ -203,17 +210,32 @@ export async function ProjectsSection() {
               from base Typhlosion, keyed by the "-hisui" regional-form
               suffix, national dex #10233 — paired with Charizard. */}
           <ScrollReveal className="w-full">
-            <PillRow leftPokemon="typhlosion-hisui" rightPokemon="charizard" />
+            <PillRow
+              leftPokemon="typhlosion-hisui"
+              rightPokemon="charizard"
+              projectSlug="wonderbot-1000"
+            />
           </ScrollReveal>
 
           {/* Ceruledge (Fire/Ghost), flipped — paired with Milotic. */}
           <ScrollReveal className="w-full">
-            <PillRow leftPokemon="ceruledge" rightPokemon="milotic" flipLeftSprite />
+            <PillRow
+              leftPokemon="ceruledge"
+              rightPokemon="milotic"
+              flipLeftSprite
+              projectSlug="playswapmeat"
+            />
           </ScrollReveal>
 
           {/* Annihilape, flipped — paired with Scovillain. */}
           <ScrollReveal className="w-full">
-            <PillRow leftPokemon="annihilape" rightPokemon="scovillain" flipLeftSprite />
+            <PillRow
+              leftPokemon="annihilape"
+              rightPokemon="scovillain"
+              flipLeftSprite
+              // Household OS's post file is named house-ops.mdx.
+              projectSlug="house-ops"
+            />
           </ScrollReveal>
 
           {/* Basculegion, flipped — paired with Dragapult. PokeAPI has no
@@ -224,17 +246,28 @@ export async function ProjectsSection() {
               leftPokemon="basculegion-male"
               rightPokemon="dragapult"
               flipLeftSprite
+              projectSlug="moonbob-money"
             />
           </ScrollReveal>
 
           {/* Froslass, unflipped — paired with Skeledirge. */}
           <ScrollReveal className="w-full">
-            <PillRow leftPokemon="froslass" rightPokemon="skeledirge" />
+            <PillRow
+              leftPokemon="froslass"
+              rightPokemon="skeledirge"
+              // Laango Scheduling Service's post file is named laango-django.mdx.
+              projectSlug="laango-django"
+            />
           </ScrollReveal>
 
           {/* Golurk, flipped — paired with Garchomp. */}
           <ScrollReveal className="w-full">
-            <PillRow leftPokemon="golurk" rightPokemon="garchomp" flipLeftSprite />
+            <PillRow
+              leftPokemon="golurk"
+              rightPokemon="garchomp"
+              flipLeftSprite
+              projectSlug="apre-method"
+            />
           </ScrollReveal>
         </div>
       </div>

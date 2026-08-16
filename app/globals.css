@@ -126,6 +126,31 @@ html {
   margin-bottom: 1.25em !important;
 }
 
+/* .prose's colors above follow the *system's* prefers-color-scheme via its
+   dark: variants, which is correct for the old site (it actually supports
+   light mode). The homepage's project modal is always dark regardless of
+   system preference, so on a light-mode system .prose's un-prefixed (light-
+   mode) colors would apply against the modal's dark panel — e.g. .prose p's
+   text-neutral-800 read at low contrast on black, and .prose pre's
+   bg-neutral-50 would render as a near-white code block. Pairing this class
+   alongside .prose forces the same colors the dark: variants would give,
+   unconditionally. */
+.prose-invert.prose a {
+  @apply decoration-neutral-600;
+}
+
+.prose-invert.prose .anchor:after {
+  @apply text-neutral-700;
+}
+
+.prose-invert.prose pre {
+  @apply bg-neutral-900 border-neutral-900;
+}
+
+.prose-invert.prose p {
+  @apply text-neutral-200;
+}
+
 pre::-webkit-scrollbar {
   display: none;
 }
