@@ -19,39 +19,36 @@ export function AboutSection() {
           scroll-mt-24 already covering nav clearance, that padding was pure
           black space between the hero and this section's own content. */}
       <div className="mx-auto max-w-6xl px-4 pb-24 pt-8 sm:px-6 lg:pt-16">
-        {/* ml-auto pushes the group to the right within the wide container,
-            same as before. Now a row rather than a single column: the Steam
-            capsule art sits to the left of the heading/paragraph,
-            items-center aligns the two evenly on the shared vertical centre
-            rather than by their tops. Stacked (flex-col) below lg — a row
-            this wide would otherwise force the photo down to a sliver.
-            Wrapped in ScrollReveal rather than animating on mount (like the
-            hero) — this section starts off-screen below the fold, so its
-            entrance should fire when the visitor actually scrolls to it. */}
-        <ScrollReveal className="ml-auto flex w-fit flex-col items-center gap-8 lg:flex-row">
+        {/* ml-auto pushes the column to the right within the wide container,
+            same as the pre-photo layout — max-w-xl gives it a definite width
+            to push *within*, which is what makes ml-auto have any effect at
+            all on a width:auto block. Single stacked column now: heading,
+            then the Steam capsule art, then the paragraph, so the photo
+            reads as illustrating the About heading rather than sitting
+            beside the prose. Wrapped in ScrollReveal rather than animating
+            on mount (like the hero) — this section starts off-screen below
+            the fold, so its entrance should fire when the visitor actually
+            scrolls to it. */}
+        <ScrollReveal className="ml-auto max-w-xl text-right">
+          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            About
+          </h2>
+
+          {/* ml-auto right-aligns the image within the column — text-align
+              only affects inline content, so the heading/paragraph's
+              text-right above doesn't touch this block-level element on its
+              own. */}
           <Image
             src="/assets/backgrounds/swapmeat-steam.jpg"
             alt="Swap Meat on Steam"
             width={460}
             height={215}
-            // w-[460px], not w-full max-w-[460px]: the parent ScrollReveal is
-            // w-fit (sized to its own content) so it has no width of its own
-            // to be a percentage *of* — w-full there resolves against
-            // nothing meaningful and the image ends up smaller than
-            // intended. An explicit width sidesteps that; max-w-full is just
-            // the narrow-viewport fallback so it can still shrink on a
-            // phone.
-            className="w-[460px] max-w-full rounded-lg"
+            className="ml-auto mt-6 w-[460px] max-w-full rounded-lg"
           />
 
-          <div className="max-w-xl text-right">
-            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              About
-            </h2>
-            <p className="mt-6 text-base leading-relaxed text-neutral-500 sm:text-lg">
-              {ABOUT_PARAGRAPH}
-            </p>
-          </div>
+          <p className="mt-6 text-base leading-relaxed text-neutral-500 sm:text-lg">
+            {ABOUT_PARAGRAPH}
+          </p>
         </ScrollReveal>
       </div>
     </section>
