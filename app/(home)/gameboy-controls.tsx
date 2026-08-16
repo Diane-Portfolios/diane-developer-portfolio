@@ -74,6 +74,32 @@ const BUTTONS: {
   },
 ]
 
+// Soft halos behind the D-pad and B button, so it reads as "press me"
+// rather than looking like an ordinary static photo of a console. One glow
+// per physical button rather than one per hit-region — four small glows
+// stitched around the cross would look like separate lights instead of one
+// button. Circles centred on each button's own bbox (see BUTTONS' comment),
+// sized a bit past it so the blur has room to bleed outward: radius is
+// roughly the button's own half-width plus a few px of bloom — tight enough
+// that it reads as a highlight on the button rather than a wash over the
+// whole corner of the console.
+const GLOWS: { key: 'dpad' | 'b'; rect: { left: string; top: string; width: string; height: string } }[] = [
+  {
+    key: 'dpad',
+    // Centred on the padded D-pad bbox (166.5, 919), radius 105.
+    rect: { left: pct(61.5, 812), top: pct(814, 1046), width: pct(210, 812), height: pct(210, 1046) },
+  },
+  {
+    key: 'b',
+    // Centred on the padded B bbox (544.5, 942), radius 62.
+    rect: { left: pct(482.5, 812), top: pct(880, 1046), width: pct(124, 812), height: pct(124, 1046) },
+  },
+]
+
+// Low peak alpha and an early falloff — a hint of light rather than a wash.
+const GLOW_GRADIENT =
+  'radial-gradient(circle, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 35%, rgba(255,255,255,0) 65%)'
+
 // Clickable overlay for the D-pad and B button printed on the console
 // artwork (see page.tsx — sits alongside GameBoyScreen in the same
 // percentage coordinate space as the console Image). Disabled until the
@@ -85,6 +111,24 @@ export function GameBoyControls() {
 
   return (
     <>
+      {/* Decorative — the glow only signals that the buttons underneath are
+          live, it carries no information of its own, so it's aria-hidden
+          and non-interactive. Fades in with the buttons becoming enabled
+          (outer div) and pulses gently once visible (inner div) — split
+          across two elements because a CSS animation and a React-driven
+          opacity transition fighting over the same property on one element
+          would fight each other. */}
+      {GLOWS.map(({ key, rect }) => (
+        <div
+          key={key}
+          aria-hidden="true"
+          className="pointer-events-none absolute rounded-full transition-opacity duration-700"
+          style={{ ...rect, opacity: controlsEnabled ? 1 : 0 }}
+        >
+          <div className="ns-controls-glow h-full w-full rounded-full" style={{ background: GLOW_GRADIENT }} />
+        </div>
+      ))}
+
       {BUTTONS.map(({ key, label, rect }) => (
         <button
           key={key}
