@@ -98,7 +98,12 @@ html {
 @media (min-width: 1024px) {
   .about-layout {
     grid-template-columns: auto 36rem;
-    grid-template-areas: 'photo title' 'photo para';
+    /* photo lives only in the para row now (was 'photo title' / 'photo
+       para', spanning both) so its own top/bottom edges land exactly on
+       the paragraph block's top/bottom rather than stretching up under
+       the heading too — see the crop/self-stretch handling on
+       .about-photo below. */
+    grid-template-areas: '. title' 'photo para';
     column-gap: 2rem;
     align-items: center;
     max-width: none;
@@ -106,6 +111,13 @@ html {
        column's true right edge, not wherever their own content happens to
        end. */
     justify-items: stretch;
+  }
+
+  .about-photo {
+    /* Overrides the grid's own align-items: center — the photo should
+       fill the para row's full height (so its edges match the paragraph
+       block's edges exactly), not sit centred at its own shorter height. */
+    align-self: stretch;
   }
 }
 

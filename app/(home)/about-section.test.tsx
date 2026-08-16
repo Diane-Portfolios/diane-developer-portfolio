@@ -44,7 +44,11 @@ describe('AboutSection', () => {
     render(await AboutSection())
 
     const heading = screen.getByRole('heading', { name: 'About' })
-    const photo = screen.getByAltText('Swap Meat on Steam')
+    // Two photo elements exist — see the note on about-section.tsx for why
+    // (a plain <img> below lg, a `fill` variant at lg+, toggled by
+    // lg:hidden/hidden lg:block since neither sizing approach works at
+    // every breakpoint on its own). Either stands in for "the photo" here.
+    const [photo] = screen.getAllByAltText(/glowing Poké Ball/)
     const paragraphs = screen.getByText(/I started figuring out/)
 
     // DOCUMENT_POSITION_FOLLOWING means the argument comes *after* the node
@@ -61,11 +65,52 @@ describe('AboutSection', () => {
     render(await AboutSection())
 
     expect(screen.getByRole('heading', { name: 'About' })).toHaveClass('about-title')
-    expect(screen.getByAltText('Swap Meat on Steam')).toHaveClass('about-photo')
+    for (const photo of screen.getAllByAltText(/glowing Poké Ball/)) {
+      expect(photo.closest('.about-photo')).not.toBeNull()
+    }
     // Both paragraphs share one grid area (see the note on about-section.tsx
     // for why), so the class lives on their shared wrapper, not on either
     // <p> itself.
     expect(screen.getByText(/I started figuring out/).closest('.about-para')).not.toBeNull()
+  })
+
+  it('renders a plain, uncropped photo below lg and a cropped-from-the-top `fill` photo at lg+, one hidden at each breakpoint', async () => {
+    render(await AboutSection())
+
+    const [mobilePhoto, lgPhoto] = screen.getAllByAltText(/glowing Poké Ball/)
+
+    // Below lg: a plain sized <img>, at its native 1200×1800 (2:3) ratio —
+    // see the note on about-section.tsx for why a plain <img> (rather than
+    // a `fill` image) is what's needed for max-w-full to actually shrink
+    // it on narrow screens. lg:hidden hides it once the lg variant takes
+    // over.
+    expect(mobilePhoto).toHaveAttribute('width', '460')
+    expect(mobilePhoto).toHaveAttribute('height', '690')
+    expect(mobilePhoto).toHaveClass('lg:hidden')
+    expect(mobilePhoto.closest('.about-photo')).toBe(mobilePhoto)
+
+    // At lg+: a `fill` image (no width/height attributes) inside a
+    // `hidden lg:block` wrapper carrying the .about-photo class instead —
+    // object-bottom crops the excess off the *top* of the photo once the
+    // wrapper stretches to the para row's own height (.about-photo's
+    // align-self: stretch in globals.css), rather than the photo's own
+    // full height growing that row to match, as a plain <img> would.
+    expect(lgPhoto).not.toHaveAttribute('width')
+    expect(lgPhoto).not.toHaveAttribute('height')
+    expect(lgPhoto).toHaveClass('object-cover')
+    expect(lgPhoto).toHaveClass('object-bottom')
+    const lgWrapper = lgPhoto.closest('.about-photo') as HTMLElement
+    expect(lgWrapper).not.toBe(lgPhoto)
+    expect(lgWrapper).toHaveClass('hidden')
+    expect(lgWrapper).toHaveClass('lg:block')
+  })
+
+  it('applies text-wrap: pretty to the paragraphs, so the browser avoids leaving a lone word on the last line', async () => {
+    render(await AboutSection())
+
+    expect(screen.getByText(/I started figuring out/).closest('.about-para')).toHaveClass(
+      'text-pretty'
+    )
   })
 
   it('renders the childhood-origin paragraph before the Swapmeat paragraph, both in the shared grid area', async () => {
@@ -77,6 +122,18 @@ describe('AboutSection', () => {
     expect(paragraphs).toHaveLength(2)
     expect(paragraphs[0].textContent).toMatch(/^I started figuring out/)
     expect(paragraphs[1].textContent).toMatch(/^Fast-forwarding to my professional career/)
+  })
+
+  it('links "Swapmeat on Steam" in the second paragraph to its Steam store page, opened in a new tab', async () => {
+    render(await AboutSection())
+
+    const link = screen.getByRole('link', { name: 'Swapmeat on Steam' })
+    expect(link).toHaveAttribute('href', 'https://store.steampowered.com/app/2790700/SWAPMEAT/')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'))
+    expect(link.closest('p')?.textContent).toMatch(
+      /^Fast-forwarding to my professional career, I shipped Swapmeat on Steam, localized in 6 languages\./
+    )
   })
 
   it('renders the six team sprites, left-aligned above the heading, in the same order ProjectsSection used to', async () => {
