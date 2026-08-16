@@ -18,4 +18,13 @@ describe('ExperienceSection', () => {
       expect.stringContaining('unsplash-retro-desk')
     )
   })
+
+  it('renders the job title, company, dates, and every bullet', () => {
+    render(<ExperienceSection />)
+    expect(screen.getByRole('heading', { name: 'Software Engineer' })).toBeInTheDocument()
+    expect(screen.getByText('One More Game')).toBeInTheDocument()
+    expect(screen.getByText('March 2026 – Present')).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem')).toHaveLength(5)
+    expect(screen.getByText(/SWAPMEAT/)).toBeInTheDocument()
+  })
 })
