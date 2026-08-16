@@ -10,7 +10,7 @@ export default function HomeLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-dvh">
       {/* Scroll-reveal blocks (scroll-reveal.tsx) start at opacity 0 and need
           JS — an IntersectionObserver — to ever become visible. Every other
           entrance animation on this page is pure CSS and works with JS off;
