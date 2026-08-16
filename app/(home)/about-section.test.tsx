@@ -4,7 +4,7 @@ import { AboutSection } from './about-section'
 
 // AboutSection is an async Server Component now that it fetches the team's
 // PokeAPI artwork (see pokemon-artwork.ts) — same reasoning as
-// ProjectsSection's PillRow (see the note atop projects-section.test.tsx):
+// ProjectsSection's ProjectTile (see the note atop projects-section.test.tsx):
 // it has to be awaited and rendered from its resolved element rather than
 // passed to render() directly.
 function mockPokeApiFetch() {

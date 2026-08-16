@@ -28,21 +28,21 @@ describe('ProjectLabel', () => {
     expect(screen.queryByText('Wonderbot is an automation workflow.')).not.toBeInTheDocument()
   })
 
-  it('renders the subtitle inside the trigger button when given', () => {
+  it('renders the overview inside the trigger button when given', () => {
     render(
       <ProjectLabel
         title="Wonderbot-1000"
-        subtitle="An automated social media scraper"
+        overview="An automated social media scraper"
         dateLabel="May 27, 2026"
       >
         <p>content</p>
       </ProjectLabel>
     )
-    const subtitle = screen.getByText('An automated social media scraper')
-    expect(subtitle.closest('button')).toHaveAccessibleName(/Wonderbot-1000/)
+    const overview = screen.getByText('An automated social media scraper')
+    expect(overview.closest('button')).toHaveAccessibleName(/Wonderbot-1000/)
   })
 
-  it('renders no subtitle text at all when none is given', () => {
+  it('renders no overview text at all when none is given', () => {
     setup()
     // Nothing else to assert against by content, so just confirm the trigger
     // button holds only the title's own text node.
@@ -71,7 +71,7 @@ describe('ProjectLabel', () => {
     const dateNode = screen.getByText('May 27, 2026')
     // Portaled content is a child of document.body, not nested under the
     // component's own render container (which only holds the trigger
-    // button) — this is what makes the modal escape PillRow's z-10 stacking
+    // button) — this is what makes the modal escape any ancestor stacking
     // context in the real page (see the comment on the portal call site).
     expect(document.body.contains(dateNode)).toBe(true)
     expect(container.contains(dateNode)).toBe(false)

@@ -3,65 +3,67 @@ import { formatDate, getBlogPosts } from '../old-site/blog/utils'
 import { ProjectLabel } from './project-label'
 import { ScrollReveal } from './scroll-reveal'
 
-// One title pill — the template. The poke-ball+sprite pairs that used to
+// Every post's MDX body follows the same "## **Overview**" heading pattern
+// (see any file in app/old-site/blog/posts/*.mdx) — this pulls just that
+// paragraph out so the tile face can show a real excerpt instead of a
+// hand-written subtitle, while the full post (all sections) still opens in
+// ProjectLabel's popup on click. Exported for direct testing.
+export function extractOverview(content: string): string {
+  const match = content.match(/##\s*\*{0,2}Overview\*{0,2}\s*\n([\s\S]*?)(?:\n##\s|$)/)
+  if (!match) return ''
+  return match[1]
+    .replace(/<br\s*\/?>/g, '')
+    .trim()
+}
+
+// One project tile — the template. The poke-ball+sprite pairs that used to
 // flank each pill live in AboutSection now instead (see the note there), so
-// this is just the pill and its title/subtitle.
+// this is just the tile and its title/overview.
 //
 // projectSlug looks the post up from the old site's own blog posts
 // (app/old-site/blog/posts/*.mdx) via the same getBlogPosts() that site
 // still uses — one real source of content instead of a second copy. The full
 // post — title, date, and MDX body the old blog page rendered — opens in
-// ProjectLabel's popup on click.
+// ProjectLabel's popup on click; the tile face shows just the title and the
+// post's own Overview paragraph (see extractOverview above).
 //
-// subtitle and titleOverride are deliberately separate from the post's own
-// frontmatter (title/summary): the pill wants a short, punchy line distinct
-// from the blog post's own formal summary, and in Playswapmeat's case a
-// different display title than the post's own — without touching that post's
-// real title, which old-site's blog pages/sitemap/RSS still use as-is.
+// titleOverride is deliberately separate from the post's own frontmatter
+// title: in Playswapmeat's case it wants a different display title than the
+// post's own — without touching that post's real title, which old-site's
+// blog pages/sitemap/RSS still use as-is.
 // Exported (in addition to being used internally by ProjectsSection) so it's
 // directly testable — as an async Server Component it can only be invoked as
 // a plain function and awaited, not rendered via JSX through a normal client
 // render tree.
-export async function PillRow({
+export async function ProjectTile({
   projectSlug,
-  subtitle,
   titleOverride,
 }: {
   projectSlug: string
-  subtitle: string
   titleOverride?: string
 }) {
   const post = getBlogPosts().find((p) => p.slug === projectSlug)
 
   return (
-    <div className="flex w-full justify-center">
-      {/* Translucent white rather than translucent black: the section
-          behind it is already pure black, so an actual black fill at any
-          opacity would stay black and the pill would disappear. White at
-          low opacity is the standard way to get a visible "frosted dark
-          grey" panel against a black backdrop. */}
+    <>
       {post && (
-        <div className="rounded-full bg-white/15 px-8 py-4 text-center sm:px-10 sm:py-5">
-          <ProjectLabel
-            title={titleOverride ?? post.metadata.title}
-            subtitle={subtitle}
-            dateLabel={formatDate(post.metadata.publishedAt)}
-          >
-            <CustomMDX source={post.content} />
-          </ProjectLabel>
-        </div>
+        <ProjectLabel
+          title={titleOverride ?? post.metadata.title}
+          overview={extractOverview(post.content)}
+          dateLabel={formatDate(post.metadata.publishedAt)}
+        >
+          <CustomMDX source={post.content} />
+        </ProjectLabel>
       )}
-    </div>
+    </>
   )
 }
 
-// All six Pokémon pill rows, on their own plain black section below
-// ExperienceSection, with the "Projects" title right above the first pill —
+// All six project tiles, on their own plain black section below
+// ExperienceSection, with the "Projects" title right above the grid —
 // text-right to keep the About/Experience/Projects alternation going (About
 // right, Experience left, Projects right) now that Projects has its own
-// section again rather than sharing ExperienceSection's row. Each pill's
-// title and subtitle are real project content now (see projectSlug/subtitle
-// on PillRow).
+// section again rather than sharing ExperienceSection's row.
 export async function ProjectsSection() {
   return (
     // id="projects" is the nav's anchor target; scroll-mt-24 clears the fixed
@@ -78,57 +80,39 @@ export async function ProjectsSection() {
           </h2>
         </ScrollReveal>
 
-        {/* Each pill gets its own ScrollReveal rather than one wrapping the
-            whole list — that made every row appear at once the moment the
-            top of the list crossed into view. Individual observers mean each
-            row fades in independently right as it crosses the threshold, so
-            they render one-by-one while the visitor scrolls down them.
-            w-full on the wrapper matters: without it the wrapper (now the
-            actual flex child) shrinks to fit content under this container's
-            items-start, and PillRow's own w-full inside it would have
-            nothing to be 100% of. items-start still reads as centred — every
-            pill is w-full, so cross-axis alignment never actually shows. */}
-        <div className="mt-8 flex flex-col items-start gap-8 sm:gap-4">
-          <ScrollReveal className="w-full">
-            <PillRow projectSlug="wonderbot-1000" subtitle="An automated social media scraper" />
+        {/* Each tile gets its own ScrollReveal rather than one wrapping the
+            whole grid — that made every tile appear at once the moment the
+            top of the grid crossed into view. Individual observers mean each
+            tile fades in independently right as it crosses the threshold, so
+            they render one-by-one while the visitor scrolls down them. */}
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ScrollReveal>
+            <ProjectTile projectSlug="wonderbot-1000" />
           </ScrollReveal>
 
-          {/* titleOverride: "Playswapmeat.com" for the pill/modal display —
+          {/* titleOverride: "Playswapmeat.com" for the tile/modal display —
               the post's own frontmatter title ("Playswapmeat") stays as-is,
               still used by old-site's blog listing/page/sitemap/RSS. */}
-          <ScrollReveal className="w-full">
-            <PillRow
-              projectSlug="playswapmeat"
-              titleOverride="Playswapmeat.com"
-              subtitle="Marketing website for Swapmeat, by One More Game"
-            />
+          <ScrollReveal>
+            <ProjectTile projectSlug="playswapmeat" titleOverride="Playswapmeat.com" />
           </ScrollReveal>
 
           {/* Household OS's post file is named house-ops.mdx. */}
-          <ScrollReveal className="w-full">
-            <PillRow projectSlug="house-ops" subtitle="Automated household manager" />
+          <ScrollReveal>
+            <ProjectTile projectSlug="house-ops" />
           </ScrollReveal>
 
-          <ScrollReveal className="w-full">
-            <PillRow
-              projectSlug="moonbob-money"
-              subtitle="I created crypto and named it after my cat"
-            />
+          <ScrollReveal>
+            <ProjectTile projectSlug="moonbob-money" />
           </ScrollReveal>
 
           {/* Laango Scheduling Service's post file is named laango-django.mdx. */}
-          <ScrollReveal className="w-full">
-            <PillRow
-              projectSlug="laango-django"
-              subtitle="A scheduling service for translation and interpreting agencies"
-            />
+          <ScrollReveal>
+            <ProjectTile projectSlug="laango-django" />
           </ScrollReveal>
 
-          <ScrollReveal className="w-full">
-            <PillRow
-              projectSlug="apre-method"
-              subtitle="A calculated approach to progressive overload"
-            />
+          <ScrollReveal>
+            <ProjectTile projectSlug="apre-method" />
           </ScrollReveal>
         </div>
       </div>

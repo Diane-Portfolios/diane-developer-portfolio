@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getPokemonArtworkUrl } from './pokemon-artwork'
 
-// Both AboutSection and ProjectsSection's PillRow consume this indirectly,
+// Both AboutSection and ProjectsSection's ProjectTile consume this indirectly,
 // but only exercise the "ok" and "ok: false" branches between them — the
 // thrown-exception and malformed-response branches only exist because of
 // this file's own try/catch and optional chaining, so they're covered here

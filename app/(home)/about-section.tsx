@@ -43,7 +43,9 @@ const OPPONENT_POKEMON = [
 
 // Started at 32px (half of ProjectsSection's old 64px poke-ball
 // thumbnails), then bumped up twice — to 40px, then to 56px — since each
-// prior size still read as too small to register clearly at a glance.
+// prior size still read as too small to register clearly at a glance. Now a
+// cap rather than a fixed size: flex-1/min-w-0 below let each sprite shrink
+// below it on narrow screens instead of overflowing the row.
 const TEAM_SPRITE_SIZE = 56
 
 // Plain img rather than next/image, same reasoning as ProjectsSection's own
@@ -66,7 +68,13 @@ function TeamSprite({
       aria-hidden="true"
       width={TEAM_SPRITE_SIZE}
       height={TEAM_SPRITE_SIZE}
-      className="pointer-events-none h-14 w-14 select-none"
+      // flex-1/min-w-0 (overriding a flex item's default min-width:auto,
+      // which would otherwise refuse to shrink below the image's own
+      // content size) let all six sprites compress evenly to fit the row's
+      // actual width on narrow screens; max-w-14/max-h-14 caps that same
+      // growth at the original 56px on wider ones. aspect-square keeps each
+      // sprite from squashing as its width shrinks.
+      className="pointer-events-none aspect-square min-w-0 max-w-14 flex-1 select-none"
       style={flip ? { transform: 'scaleX(-1)' } : undefined}
     />
   )
@@ -143,21 +151,26 @@ export async function AboutSection() {
               the same max-w-full fallback a plain <img> gets, so that
               version overflowed the page below lg instead.
 
-              Splitting into two images sidesteps the conflict: below lg,
-              the plain <img> variant (lg:hidden) renders at its native
-              1200×1800 (2:3) ratio, uncropped. At lg+, the `fill` variant
-              (hidden lg:block) stretches to the para row's own height
-              (.about-photo's align-self: stretch in globals.css), and
-              object-bottom crops the excess off the *top* of the photo —
-              so the image's bottom edge lands on the paragraph's last
-              line, and since that row starts where the paragraph itself
-              starts, the top edge lands on the paragraph's first line. */}
+              Splitting into two images sidesteps the conflict while still
+              cropping both: below lg, the plain <img> variant (lg:hidden)
+              keeps the shrink-to-fit fallback, with aspect-[4/3] fixing its
+              displayed ratio (rather than the native 1200×1800) and
+              object-cover/object-bottom cropping the excess off the top —
+              same crop direction as the lg+ version, just against a fixed
+              ratio instead of the paragraph's own dynamic height. At lg+,
+              the `fill` variant (hidden lg:block) stretches to the para
+              row's own height (.about-photo's align-self: stretch in
+              globals.css), and object-bottom crops the excess off the top
+              there too — so the image's bottom edge lands on the
+              paragraph's last line, and since that row starts where the
+              paragraph itself starts, the top edge lands on the
+              paragraph's first line. */}
           <Image
             src="/assets/backgrounds/pokeball-glow.jpg"
             alt="A glowing Poké Ball wrapped in string lights, with a neon Pikachu-ear lamp and a holographic disc in the background"
             width={460}
             height={690}
-            className="about-photo w-[460px] max-w-full rounded-lg lg:hidden"
+            className="about-photo aspect-[4/3] w-[460px] max-w-full rounded-lg object-cover object-bottom lg:hidden"
           />
           <div className="about-photo relative hidden w-[460px] overflow-hidden rounded-lg lg:block">
             <Image
