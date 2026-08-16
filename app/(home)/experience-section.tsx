@@ -54,8 +54,18 @@ export function ExperienceSection() {
 
           {/* max-w-2xl rather than About's narrower max-w-xl — these are
               dense, single-line resume bullets rather than conversational
-              prose, and read better with a bit more width. */}
-          <div className="mt-10 max-w-2xl space-y-12">
+              prose, and read better with a bit more width. Semitransparent
+              panel (not applied to the heading above, which stays directly
+              on the photo) so the resume text stays legible against the
+              busy retro-desk background behind it.
+
+              Carl (public/assets/backgrounds/carl-mirrored.png — a
+              horizontally-mirrored version of Carl.png with the curly "CR"
+              logo on his capsule left un-mirrored, composited back on so
+              it still reads correctly) used to sit centered in the space
+              to the right of this panel. Pulled off the page for now at
+              request — the asset's kept around, ready to re-add. */}
+          <div className="mt-10 max-w-2xl space-y-12 rounded-2xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm sm:p-8">
             {EXPERIENCE.map((job) => (
               <div key={job.title}>
                 <h3 className="text-xl font-semibold text-white sm:text-2xl">

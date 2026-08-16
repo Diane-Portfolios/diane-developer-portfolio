@@ -27,4 +27,15 @@ describe('ExperienceSection', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(5)
     expect(screen.getByText(/SWAPMEAT/)).toBeInTheDocument()
   })
+
+  it('puts a semitransparent panel behind the job entries, but not behind the Experience heading itself', () => {
+    render(<ExperienceSection />)
+
+    const panel = screen.getByText('One More Game').closest('.bg-black\\/40') as HTMLElement
+    expect(panel).not.toBeNull()
+    // The job entry (title/company/dates/bullets) lives inside the panel...
+    expect(panel).toContainElement(screen.getByRole('heading', { name: 'Software Engineer' }))
+    // ...but the section heading above it does not.
+    expect(panel).not.toContainElement(screen.getByRole('heading', { name: 'Experience' }))
+  })
 })
