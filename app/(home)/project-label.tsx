@@ -3,20 +3,20 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
-// The clickable project title (and, at sm and up, subtitle) in a pill's
-// centre, and the popup it opens. title/subtitle/dateLabel are plain strings
+// The clickable project tile — title and overview blurb — and the popup it
+// opens with the full write-up. title/overview/dateLabel are plain strings
 // and `children` is the project's MDX content already rendered server-side
-// (CustomMDX is an RSC — it can't run in this client component) — PillRow
+// (CustomMDX is an RSC — it can't run in this client component) — the caller
 // renders it and passes the result down, same pattern as passing any other
 // Server Component output into a Client Component.
 export function ProjectLabel({
   title,
-  subtitle,
+  overview,
   dateLabel,
   children,
 }: {
   title: string
-  subtitle?: string
+  overview?: string
   dateLabel: string
   children: ReactNode
 }) {
@@ -42,35 +42,24 @@ export function ProjectLabel({
 
   return (
     <>
-      {/* Same hover glow/scale the placeholder label had, now on a real
-          button so it's keyboard-operable too. */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="cursor-pointer text-center transition-all duration-300 ease-out hover:scale-105 hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.75)]"
+        // flex flex-col items-start: overrides the browser default of
+        // vertically centering a <button>'s content, so title/overview stay
+        // pinned to the top of the tile instead of drifting toward its
+        // middle on rows where a sibling tile's longer overview stretches
+        // every tile in the row taller.
+        className="flex h-full w-full cursor-pointer flex-col items-start rounded-2xl border border-white/10 bg-white/5 p-6 text-left transition-all duration-300 ease-out hover:-translate-y-1 hover:border-white/20 hover:bg-white/10 hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.25)]"
       >
-        <h3 className="text-sm font-semibold tracking-tight text-white sm:text-lg">
-          {title}
-        </h3>
-        {/* Hidden below sm rather than always shown: mobile pills are
-            already sized to just fit the title against the (smaller)
-            sprites flanking it — see the note on PillRow's row div — and a
-            second line risks pushing the label taller than the pill
-            capsule behind it on the narrowest screens. */}
-        {subtitle && (
-          <p className="hidden text-sm italic text-neutral-400 sm:mt-1 sm:block">
-            {subtitle}
-          </p>
-        )}
+        <h3 className="text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
+        {overview && <p className="mt-3 text-sm leading-relaxed text-neutral-400">{overview}</p>}
       </button>
 
-      {/* Portaled to document.body rather than rendered in place: PillRow's
-          row wrapper sets z-10 with position:relative, which creates its own
-          stacking context — a fixed descendant's z-index is then compared
-          only against siblings *inside* that context, not globally, so a
-          plain z-50 here would still end up visually under the nav's z-30
-          (and swallow clicks near the top of the screen behind it). A portal
-          escapes that ancestor entirely. */}
+      {/* Portaled to document.body rather than rendered in place: the tile
+          grid sits in a normal stacking context, but portaling still keeps
+          this escaping any ancestor stacking context that might otherwise
+          put it under the nav's z-30. */}
       {open &&
         createPortal(
           // Backdrop click closes; the panel stops that click from bubbling
