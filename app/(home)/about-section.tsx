@@ -1,8 +1,6 @@
 import { ScrollReveal } from './scroll-reveal'
 
-// PLACEHOLDER — replace with your own paragraph. Left visibly marked (rather
-// than lorem ipsum) so it can't accidentally ship as real copy.
-const PLACEHOLDER = 'Write your About paragraph here.'
+const ABOUT_PARAGRAPH = `I shipped Swapmeat on Steam, now localized in 6 languages. That project is where localization stopped being an abstract interest and became the thing I actually want to work on — figuring out how a game, a campaign, or a tool holds up when it's no longer just built for one language or one market. I like the technical side of that problem as much as the human side: the pipelines and automation that make it scalable, and the judgment calls that keep it feeling natural instead of translated. That's the kind of work I'm looking to keep doing.`
 
 // The section below the hero. Its own component, matching the pattern the
 // rest of the homepage follows — one file per block — so it can keep growing
@@ -30,8 +28,8 @@ export function AboutSection() {
           <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             About
           </h2>
-          <p className="mt-6 text-base italic leading-relaxed text-neutral-500 sm:text-lg">
-            {PLACEHOLDER}
+          <p className="mt-6 text-base leading-relaxed text-neutral-500 sm:text-lg">
+            {ABOUT_PARAGRAPH}
           </p>
         </ScrollReveal>
       </div>
