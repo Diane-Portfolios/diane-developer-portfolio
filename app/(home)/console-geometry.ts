@@ -11,46 +11,35 @@ export const SCREEN_CENTRE_Y = 32.31
 
 export const CONSOLE_ASPECT = 812 / 1046
 
-// The console is 812/1046 ≈ 0.776 wide-to-tall. With the screen centre pinned to
-// the viewport centre, the taller half is the 67.69% below it, so the whole
-// console stays on screen while that half fits in 50vh — i.e. up to ~73vh. The
-// 122vw term is the same limit for narrow viewports, so the console shrinks
-// rather than overflowing on a phone.
-export const SIZE = 'min(73vh, 122vw)'
+// Console height. Below lg (1024px) the hero is a single column — the
+// console is the only thing in it, centred on the full viewport — so this is
+// the same min(73vh, 122vw) it always was: 122vw is the narrow-viewport
+// limit that keeps the console from overflowing a phone.
+//
+// At lg and up the hero becomes a 2-column layout (see page.tsx): About +
+// the work-location note stacked on the left, the console centred in its
+// own column on the right. There the console only has roughly half the
+// viewport's width to work with, not all of it, and at 73vh tall it dwarfed
+// a text column beside it rather than balancing it — --console-max-w and
+// --console-max-h carry both narrower limits in from a breakpoint-only media
+// query in globals.css (a plain CSS custom property can't express "a
+// different value above a breakpoint" any other way — Tailwind's responsive
+// prefixes only apply to classes, not to values fed into a JS-computed
+// inline style like this one).
+export const SIZE = 'min(var(--console-max-h, 73vh), var(--console-max-w, 122vw))'
 
 // Distance from the bottom of the viewport up to where the console ends.
-// SCREEN_CENTRE_Y% of its height sits above the 50vh centre line, so the
-// remaining (100 - SCREEN_CENTRE_Y)% hangs below it.
+// SCREEN_CENTRE_Y% of its height sits above the vertical centre line, so the
+// remaining (100 - SCREEN_CENTRE_Y)% hangs below it. The background photo
+// stops here (see page.tsx) so the console's base rests on solid black
+// rather than the photo running all the way to the bottom of the hero.
 export const CONSOLE_BOTTOM_INSET = `calc(50vh - ${(
   (100 - SCREEN_CENTRE_Y) / 100
 ).toFixed(4)} * ${SIZE})`
 
-// Distance from the *right* edge of the viewport to the console's left edge.
-// The console's width is CONSOLE_ASPECT x SIZE and SCREEN_CENTRE_X% of that
-// width lies left of the 50vw centre line, so its left edge is that far out.
-const HALF_LEFT = ((SCREEN_CENTRE_X / 100) * CONSOLE_ASPECT).toFixed(4)
-export const CONSOLE_LEFT_FROM_RIGHT = `calc(50vw + ${HALF_LEFT} * ${SIZE})`
-
-// Mirror of the above: distance from the *left* edge of the viewport to the
-// console's right edge. The screen centre isn't quite the console's midline
-// (49.45%, not 50%), so this is not the same number as HALF_LEFT.
-const HALF_RIGHT = (((100 - SCREEN_CENTRE_X) / 100) * CONSOLE_ASPECT).toFixed(4)
-export const CONSOLE_RIGHT_FROM_LEFT = `calc(50vw + ${HALF_RIGHT} * ${SIZE})`
-
-// Usable width of the columns either side of the console, i.e. viewport edge to
-// console edge less the gap. Both depend on SIZE, which is itself
-// min(73vh, 122vw) — so these narrow as the viewport gets *taller*, not just as
-// it gets narrower. Sizing the side text off these rather than off breakpoints
-// is what keeps it from overflowing at awkward window shapes.
-//
-// Consumers divide these by the width of their longest string in em to get a
-// font size that provably fits. Both reference var(--ns-side-gap), which the
-// consuming component sets.
-export const LEFT_COLUMN = `calc(50vw - ${HALF_LEFT} * ${SIZE} - var(--ns-side-gap))`
-export const RIGHT_COLUMN = `calc(50vw - ${HALF_RIGHT} * ${SIZE} - var(--ns-side-gap))`
-
-// Side text is hidden outside this: below 1024px there's no column at all, and
-// at aspect ratios taller than 4/3 the console grows off 73vh and squeezes the
-// columns to nothing. At exactly 4/3 the fit still holds at every size.
-export const SIDE_TEXT_VISIBLE =
-  '[@media(min-width:1024px)_and_(min-aspect-ratio:4/3)]:block'
+// How far to nudge the console down from a plain geometric centring so the
+// *screen* — not the image's own midpoint — lands at the centre of whatever
+// box centres it (the hero's grid cell). The screen sits SCREEN_CENTRE_Y%
+// down from the image's top, noticeably above its own 50% mark, so centring
+// the box by its geometry alone would leave the screen looking too high.
+export const SCREEN_Y_OFFSET = (50 - SCREEN_CENTRE_Y).toFixed(4)

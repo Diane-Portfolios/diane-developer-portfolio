@@ -47,7 +47,7 @@ export function ProjectLabel({
         onClick={() => setOpen(true)}
         className="cursor-pointer text-center transition-all duration-300 ease-out hover:scale-105 hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.75)]"
       >
-        <h3 className="text-lg font-semibold tracking-tight text-white">
+        <h3 className="text-sm font-semibold tracking-tight text-white sm:text-lg">
           {title}
         </h3>
       </button>
@@ -68,7 +68,7 @@ export function ProjectLabel({
             onClick={() => setOpen(false)}
           >
             <div
-              className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/10 bg-neutral-950 p-8 text-left text-white"
+              className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/10 bg-neutral-950 p-5 text-left text-white sm:p-8"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -80,7 +80,7 @@ export function ProjectLabel({
                 ×
               </button>
 
-              <h3 className="pr-8 text-2xl font-semibold text-white">{title}</h3>
+              <h3 className="pr-8 text-xl font-semibold text-white sm:text-2xl">{title}</h3>
               <p className="mt-1 text-sm text-neutral-500">{dateLabel}</p>
 
               <article className="prose prose-invert mt-6">{children}</article>

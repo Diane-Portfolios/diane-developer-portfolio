@@ -2,20 +2,15 @@ import { describe, expect, it } from 'vitest'
 import {
   CONSOLE_ASPECT,
   CONSOLE_BOTTOM_INSET,
-  CONSOLE_LEFT_FROM_RIGHT,
-  CONSOLE_RIGHT_FROM_LEFT,
-  LEFT_COLUMN,
-  RIGHT_COLUMN,
-  SCREEN_CENTRE_X,
   SCREEN_CENTRE_Y,
-  SIDE_TEXT_VISIBLE,
+  SCREEN_Y_OFFSET,
   SIZE,
 } from './console-geometry'
 
 // Pulls the multiplier coefficient out of a calc() string, e.g.
-// "calc(50vh - 0.6769 * min(73vh, 122vw))" -> 0.6769. Matched specifically as
+// "calc(50vh - 0.6769 * min(73vh, ...))" -> 0.6769. Matched specifically as
 // "the number right before *", not just the first number in the string —
-// that would instead grab the leading 50 from 50vh/50vw.
+// that would instead grab the leading 50 from 50vh.
 function firstCoefficient(calc: string): number {
   const match = calc.match(/([\d.]+)\s*\*/)
   if (!match) throw new Error(`no multiplier coefficient found in: ${calc}`)
@@ -25,6 +20,12 @@ function firstCoefficient(calc: string): number {
 describe('CONSOLE_ASPECT', () => {
   it('is the source PNG\'s width/height ratio', () => {
     expect(CONSOLE_ASPECT).toBeCloseTo(812 / 1046, 10)
+  })
+})
+
+describe('SIZE', () => {
+  it('caps both height and width via CSS variables (set per-breakpoint in globals.css)', () => {
+    expect(SIZE).toBe('min(var(--console-max-h, 73vh), var(--console-max-w, 122vw))')
   })
 })
 
@@ -43,43 +44,15 @@ describe('CONSOLE_BOTTOM_INSET', () => {
   })
 })
 
-describe('CONSOLE_LEFT_FROM_RIGHT / CONSOLE_RIGHT_FROM_LEFT', () => {
-  it('both embed SIZE and add to 50vw', () => {
-    for (const calc of [CONSOLE_LEFT_FROM_RIGHT, CONSOLE_RIGHT_FROM_LEFT]) {
-      expect(calc).toContain(SIZE)
-      expect(calc.startsWith('calc(50vw + ')).toBe(true)
-    }
+describe('SCREEN_Y_OFFSET', () => {
+  it('is the distance from the image\'s own vertical midpoint down to the screen', () => {
+    // The screen sits SCREEN_CENTRE_Y% down from the top, above the image's
+    // own 50% mark — nudging the box down by (50 - SCREEN_CENTRE_Y)% moves
+    // the screen (not the box) to wherever the box was originally centred.
+    expect(Number(SCREEN_Y_OFFSET)).toBeCloseTo(50 - SCREEN_CENTRE_Y, 4)
   })
 
-  it('their coefficients sum to the full console aspect ratio (they split it left/right of centre)', () => {
-    const halfLeft = firstCoefficient(CONSOLE_LEFT_FROM_RIGHT)
-    const halfRight = firstCoefficient(CONSOLE_RIGHT_FROM_LEFT)
-    expect(halfLeft + halfRight).toBeCloseTo(CONSOLE_ASPECT, 3)
-  })
-
-  it('are not equal, since the screen centre is not exactly the console midline', () => {
-    expect(CONSOLE_LEFT_FROM_RIGHT).not.toBe(CONSOLE_RIGHT_FROM_LEFT)
-  })
-
-  it('the left-from-right coefficient matches SCREEN_CENTRE_X\'s share of the aspect ratio', () => {
-    const expected = (SCREEN_CENTRE_X / 100) * CONSOLE_ASPECT
-    expect(firstCoefficient(CONSOLE_LEFT_FROM_RIGHT)).toBeCloseTo(expected, 4)
-  })
-})
-
-describe('LEFT_COLUMN / RIGHT_COLUMN', () => {
-  it('both subtract the console edge and the side gap from 50vw', () => {
-    for (const calc of [LEFT_COLUMN, RIGHT_COLUMN]) {
-      expect(calc).toContain('var(--ns-side-gap)')
-      expect(calc).toContain(SIZE)
-      expect(calc.startsWith('calc(50vw - ')).toBe(true)
-    }
-  })
-})
-
-describe('SIDE_TEXT_VISIBLE', () => {
-  it('gates on both a minimum width and a minimum aspect ratio', () => {
-    expect(SIDE_TEXT_VISIBLE).toContain('min-width:1024px')
-    expect(SIDE_TEXT_VISIBLE).toContain('min-aspect-ratio:4/3')
+  it('is positive — the screen sits above centre, so the box must move down', () => {
+    expect(Number(SCREEN_Y_OFFSET)).toBeGreaterThan(0)
   })
 })
