@@ -63,6 +63,52 @@ html {
   }
 }
 
+/* About section (see about-section.tsx): below lg the photo sits *between*
+   the heading and the paragraph in one stacked column; at lg it moves to
+   their *left*, beside a two-row text column instead. That's a reshuffle
+   from 3 stacked items into 1-beside-2, which plain flexbox `order` can't
+   express — order only resequences items within a single row/column, it
+   can't regroup them. Named grid areas just say where each piece sits at
+   each breakpoint, with no wrapper/duplication needed. */
+.about-layout {
+  display: grid;
+  grid-template-areas: 'title' 'photo' 'para';
+  row-gap: 1.5rem;
+  /* Matches Tailwind's max-w-xl. width:fit-content (not the default auto)
+     so unused space doesn't sit inside the box — the box needs to actually
+     shrink to its content for the column's own ml-auto to have anything to
+     push right within. */
+  width: fit-content;
+  max-width: 36rem;
+  justify-items: end;
+}
+
+.about-title {
+  grid-area: title;
+}
+
+.about-photo {
+  grid-area: photo;
+}
+
+.about-para {
+  grid-area: para;
+}
+
+@media (min-width: 1024px) {
+  .about-layout {
+    grid-template-columns: auto 36rem;
+    grid-template-areas: 'photo title' 'photo para';
+    column-gap: 2rem;
+    align-items: center;
+    max-width: none;
+    /* title/para should fill their 36rem column so text-right lands on the
+       column's true right edge, not wherever their own content happens to
+       end. */
+    justify-items: stretch;
+  }
+}
+
 .prose .anchor {
   @apply absolute invisible no-underline;
 

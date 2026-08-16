@@ -14,6 +14,14 @@ describe('CyclingTitle', () => {
     }
   })
 
+  it('stacks the name above the role below sm, and puts them back on one row from sm up', () => {
+    render(<CyclingTitle />)
+    const titleRoot = screen.getByText(TITLE_PREFIX, { exact: false }).parentElement!
+
+    expect(titleRoot).toHaveClass('flex-col')
+    expect(titleRoot).toHaveClass('sm:flex-row')
+  })
+
   it('only the English state is exposed to assistive tech; every other language is aria-hidden', () => {
     render(<CyclingTitle />)
     const stack = document.querySelector('.ns-cycle-stack')!

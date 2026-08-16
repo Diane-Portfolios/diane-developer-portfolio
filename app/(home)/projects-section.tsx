@@ -1,7 +1,13 @@
+import Image from 'next/image'
 import { CustomMDX } from '../components/mdx'
 import { formatDate, getBlogPosts } from '../old-site/blog/utils'
 import { ProjectLabel } from './project-label'
 import { ScrollReveal } from './scroll-reveal'
+
+// Intrinsic size passed to Image for quality/aspect-ratio — the *displayed*
+// size is set via Tailwind classes at the call site instead (h-16 w-16), so
+// this stays the sm+ pixel value (the ball is hidden entirely below sm).
+const THUMB_SIZE = 64
 
 // CSS defines 1in as exactly 96px (the "reference pixel"), independent of the
 // display's real pixel density — it's the standard browsers use to convert
@@ -103,17 +109,18 @@ export async function PillRow({
   return (
     // items-center + a shorter row below sm: the label used to be a
     // same-height absolutely positioned sibling at every width, which only
-    // works when the sprites leave real space clear in the middle — true on
-    // desktop, not on a phone-width screen where they alone were nearly the
-    // full row width. Below sm the label is now a normal flex-1 child
-    // instead (see the note on it), so justify-between still applies but
-    // the middle is no longer floating independently over the sprites.
+    // works when the ball+sprite pairs (sm+) or lone sprites (below sm)
+    // leave real space clear in the middle — true on desktop, not on a
+    // phone-width screen where they alone were nearly the full row width.
+    // Below sm the label is now a normal flex-1 child instead (see the note
+    // on it), so justify-between still applies but the middle is no longer
+    // floating independently over the sprites.
     <div className="relative z-10 flex w-full items-center justify-between">
       {/* The pill. Positioned absolute and centred on the row's own height
           (governed by the sprites, the tallest things in the row — 64px
           below sm, 128px at sm and up) rather than a hardcoded offset, so it
-          stays centred at either size. -z-10 keeps it behind the sprites
-          without them needing their own z-index.
+          stays centred at either size. -z-10 keeps it behind the ball+sprite
+          pairs without them needing their own z-index.
           Translucent white rather than translucent black: the section behind
           it is already pure black, so an actual black fill at any opacity
           would stay black and the pill would disappear. White at low opacity
@@ -124,10 +131,21 @@ export async function PillRow({
         className="absolute inset-x-0 top-1/2 -z-10 h-20 -translate-y-1/2 rounded-full bg-white/15 sm:h-24"
       />
 
-      {/* Left sprite, shifted in from the pill's left edge — the pill itself
-          stays put. Smaller inset below sm to match the smaller sprite
-          there, so it doesn't eat more of a narrow row than it has to. */}
-      <div className="ml-4 flex shrink-0 items-center sm:ml-8">
+      {/* Left ball+sprite pair, shifted in from the pill's left edge as a
+          unit — the pill itself stays put. The ball is hidden below sm: at
+          that width it's just the sprite, with a slightly bigger inset than
+          the sm+ ball+sprite pair gets, so the lone sprite doesn't hug the
+          pill's edge. */}
+      <div className="ml-4 flex shrink-0 items-center gap-4 sm:ml-6">
+        <Image
+          src="/assets/backgrounds/poke-ball.webp"
+          alt=""
+          aria-hidden
+          width={THUMB_SIZE}
+          height={THUMB_SIZE}
+          className="pointer-events-none hidden h-16 w-16 select-none sm:block"
+        />
+
         {leftSpriteUrl && <Sprite src={leftSpriteUrl} flip={flipLeftSprite} />}
       </div>
 
@@ -156,9 +174,22 @@ export async function PillRow({
         </div>
       )}
 
-      {/* Right sprite, mirroring the left one in from the pill's right
-          edge. */}
-      <div className="mr-4 flex shrink-0 items-center sm:mr-8">
+      {/* Right ball+sprite pair, mirrored — the sprite sits further into the
+          pill ("just inside of" the ball), the ball sits just inside the
+          pill's right edge at sm and up. flex-row-reverse keeps the ball
+          first in the DOM (so it's the one exposed to justify-between's
+          edge) while rendering it visually last. Ball hidden below sm, same
+          as the left pair. */}
+      <div className="mr-4 flex shrink-0 flex-row-reverse items-center gap-4 sm:mr-6">
+        <Image
+          src="/assets/backgrounds/poke-ball.webp"
+          alt=""
+          aria-hidden
+          width={THUMB_SIZE}
+          height={THUMB_SIZE}
+          className="pointer-events-none hidden h-16 w-16 select-none sm:block"
+        />
+
         {rightSpriteUrl && <Sprite src={rightSpriteUrl} />}
       </div>
     </div>

@@ -87,6 +87,28 @@ describe('PillRow', () => {
     expect(right.style.transform).toBe('')
   })
 
+  it('renders both Poké Ball icons hidden below sm (visible again from sm up), alongside both sprites', async () => {
+    const element = await PillRow({
+      leftPokemon: 'typhlosion-hisui',
+      rightPokemon: 'charizard',
+      projectSlug: 'wonderbot-1000',
+      subtitle: 'An automated social media scraper',
+    })
+    const { container } = render(element)
+
+    // jsdom doesn't evaluate media queries, so "hidden below sm" is checked
+    // via the classes themselves rather than a computed/visible style.
+    const balls = container.querySelectorAll('img[src*="poke-ball"]')
+    expect(balls).toHaveLength(2)
+    for (const ball of balls) {
+      expect(ball).toHaveClass('hidden')
+      expect(ball).toHaveClass('sm:block')
+    }
+
+    expect(container.querySelectorAll('img[src*="/sprites/"]')).toHaveLength(2)
+    expect(container.querySelectorAll('img')).toHaveLength(4)
+  })
+
   it('renders without a sprite (but without crashing) when PokeAPI fails for one side', async () => {
     vi.stubGlobal(
       'fetch',
