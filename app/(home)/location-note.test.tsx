@@ -1,29 +1,36 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { LanguageProvider } from './language-context'
 import { LocationNote } from './location-note'
 
+function renderNote(initialLanguage?: string) {
+  return render(
+    <LanguageProvider initialLanguage={initialLanguage}>
+      <LocationNote />
+    </LanguageProvider>
+  )
+}
+
 describe('LocationNote', () => {
-  it('renders the English place names by default', () => {
-    render(<LocationNote />)
+  it('renders the English label and place names by default', () => {
+    renderNote()
+    expect(screen.getByText('I work in')).toBeInTheDocument()
     expect(screen.getByText('Seattle, WA')).toBeInTheDocument()
     expect(screen.getByText('Chicago, IL')).toBeInTheDocument()
   })
 
-  it('renders the Czech-declined place names too, but hidden from assistive tech', () => {
-    render(<LocationNote />)
-    const seattlu = screen.getByText('v Seattlu')
-    const chicagu = screen.getByText('v Chicagu')
-
-    expect(seattlu.closest('[aria-hidden="true"]')).not.toBeNull()
-    expect(chicagu.closest('[aria-hidden="true"]')).not.toBeNull()
+  it('declines the place names into Czech only when Czech is selected', () => {
+    renderNote('cs')
+    expect(screen.getByText('Pracuji')).toBeInTheDocument()
+    expect(screen.getByText('v Seattlu')).toBeInTheDocument()
+    expect(screen.getByText('v Chicagu')).toBeInTheDocument()
+    expect(screen.queryByText('Seattle, WA')).not.toBeInTheDocument()
   })
 
-  it('the English (non-Czech) place block is not itself aria-hidden', () => {
-    render(<LocationNote />)
-    const seattle = screen.getByText('Seattle, WA')
-    // Its nearest aria-hidden ancestor, if any, must be further up than the
-    // dedicated "non-Czech" wrapper — i.e. this block itself isn't hidden.
-    const nonCzechWrapper = seattle.closest('.ns-rot-default')!
-    expect(nonCzechWrapper).not.toHaveAttribute('aria-hidden')
+  it("shows another language's label without touching the (undeclined) place names", () => {
+    renderNote('fr')
+    expect(screen.getByText('Je travaille à')).toBeInTheDocument()
+    expect(screen.getByText('Seattle, WA')).toBeInTheDocument()
+    expect(screen.getByText('Chicago, IL')).toBeInTheDocument()
   })
 })

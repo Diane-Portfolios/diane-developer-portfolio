@@ -1,12 +1,15 @@
-import { SEQUENCE, rotationStyle } from './rotation'
+'use client'
+
+import { useLanguage } from './language-context'
 
 const NAME = 'Diane Stephani'
 
-// The hero's about paragraph, keyed by language, on the same rotation clock
-// as the navbar role and the work-location label — see ./rotation. Kept as a
-// one-entry array per language (rather than a single string) for the same
-// reason the old static ABOUT was: the render below maps over it, so a future
-// edit back to multiple paragraphs per language is a one-line change.
+// The hero's about paragraph, keyed by language, showing whatever language
+// the Game Boy's D-pad currently has selected (see ./language-context) — the
+// same language the navbar role and the work-location label show. Kept as a
+// one-entry array per language rather than a single string: the render below
+// maps over it, so a future edit back to multiple paragraphs per language is
+// a one-line change.
 //
 // GENDERED — French, German, Spanish, Portuguese, Czech and Italian inflect
 // for the gender of the person speaking ("I'm a software engineer..."). All
@@ -52,36 +55,23 @@ const ABOUT_BY_LANG: Record<string, string[]> = {
 // this much small text reads as a denser "mass" than a narrower, taller one
 // — the same reasoning that already applied when this sat beside the
 // console instead of above the location note. The name stays static — it's
-// the one string on the page with no translation to rotate through — but the
-// paragraph below it now rotates on the same clock as the navbar role and
-// the work-location label, so all three always show the same language.
+// the one string on the page with no translation — but the paragraph below
+// it shows whatever language is currently selected, same as the navbar role
+// and the work-location label.
 export function AboutNote() {
-  const codes = [...new Set(SEQUENCE)]
+  const { language } = useLanguage()
 
   return (
     <div className="ns-enter-side max-w-[22rem] text-left" style={{ animationDelay: '0.55s' }}>
       <h2 className="text-4xl font-semibold tracking-tight text-white">{NAME}</h2>
 
-      {/* --wrap (see globals.css): unlike the navbar role or the location
-          label, this state is a full paragraph, so it needs to wrap onto
-          multiple lines rather than forcing one long one. The stack still
-          sizes to its tallest state, same as everywhere else, so the switch
-          between languages of very different lengths never reflows the
-          column beneath it. */}
-      <div className="ns-cycle-stack ns-cycle-stack--wrap mt-4 text-sm leading-[1.7] text-neutral-300">
-        {codes.map((code) => (
-          <div
-            key={code}
-            className={code === 'en' ? 'ns-rot-default space-y-3' : 'ns-rot space-y-3'}
-            aria-hidden={code === 'en' ? undefined : 'true'}
-            lang={code === 'en' ? undefined : code}
-            dir="auto"
-            style={rotationStyle(code)}
-          >
-            {ABOUT_BY_LANG[code].map((para) => (
-              <p key={para.slice(0, 24)}>{para}</p>
-            ))}
-          </div>
+      <div
+        className="mt-4 space-y-3 text-sm leading-[1.7] text-neutral-300"
+        lang={language === 'en' ? undefined : language}
+        dir="auto"
+      >
+        {ABOUT_BY_LANG[language].map((para) => (
+          <p key={para.slice(0, 24)}>{para}</p>
         ))}
       </div>
     </div>

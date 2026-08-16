@@ -5,21 +5,21 @@ import { AboutNote } from './about-note'
 import { AboutSection } from './about-section'
 import { ContactSection } from './contact-section'
 import { ExperienceSection } from './experience-section'
+import { GameBoyControls } from './gameboy-controls'
 import { GameBoyScreen } from './gameboy-screen'
+import { LanguageProvider } from './language-context'
 import { LocationNote } from './location-note'
 import { SiteNav } from './nav'
 import { ProjectsSection } from './projects-section'
-import { ROTATION_CSS } from './rotation'
 import { SiteFooter } from './site-footer'
 
 export default function HomePage() {
   return (
-    <>
-      {/* Generated rather than hand-written: the keyframe percentages depend on
-          the slot count and fade length, so deriving them in CSS by hand would go
-          stale the moment those change. Emitted once for the whole page. */}
-      <style dangerouslySetInnerHTML={{ __html: ROTATION_CSS }} />
-
+    // Everything that shows or sets the site's language — the nav title, the
+    // hero text, the console's menu and D-pad — shares this one provider so
+    // they can't drift apart. Defaults to English; nothing changes until the
+    // console's D-pad is used (see ./language-context).
+    <LanguageProvider>
       {/* Fixed, so it stays put while everything below scrolls under it. Being
           out of flow it no longer pushes the hero down, which is what lets the
           hero be exactly one viewport tall. */}
@@ -122,6 +122,7 @@ export default function HomePage() {
                 className="pointer-events-none h-full w-full select-none"
               />
               <GameBoyScreen />
+              <GameBoyControls />
             </div>
           </div>
         </div>
@@ -132,6 +133,6 @@ export default function HomePage() {
       <ProjectsSection />
       <ContactSection />
       <SiteFooter />
-    </>
+    </LanguageProvider>
   )
 }

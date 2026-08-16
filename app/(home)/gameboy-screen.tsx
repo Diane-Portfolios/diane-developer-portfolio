@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { GameBoyMenu } from './gameboy-menu'
+import { useGameBoyControls } from './language-context'
 
 const CLIP = '/assets/animations/Game Boy Color - Startup Intro.webm'
 
@@ -35,6 +36,7 @@ export function GameBoyScreen() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [reduced, setReduced] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
+  const { setControlsEnabled } = useGameBoyControls()
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -45,8 +47,15 @@ export function GameBoyScreen() {
   }, [])
 
   const holdThenSwitch = useCallback(() => {
-    timer.current = setTimeout(() => setShowMenu(true), HOLD_MS)
-  }, [])
+    // The D-pad/B overlay (see ./gameboy-controls) only goes live once the
+    // menu itself is on screen — pressing it during the boot video/logo
+    // hold would silently change the site's language with nothing on the
+    // console showing why.
+    timer.current = setTimeout(() => {
+      setShowMenu(true)
+      setControlsEnabled(true)
+    }, HOLD_MS)
+  }, [setControlsEnabled])
 
   // Watch on every animation frame rather than via timeupdate, which only fires
   // about four times a second and would overshoot the freeze point by a wide

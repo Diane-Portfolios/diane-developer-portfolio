@@ -1,11 +1,20 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { TITLE_PREFIX } from './cycle-phrases'
+import { LanguageProvider } from './language-context'
 import { SiteNav } from './nav'
+
+function renderNav() {
+  return render(
+    <LanguageProvider>
+      <SiteNav />
+    </LanguageProvider>
+  )
+}
 
 describe('SiteNav', () => {
   it('renders home/about/experience/projects/contact as same-page anchor links, in that order', () => {
-    render(<SiteNav />)
+    renderNav()
     const nav = screen.getByRole('navigation')
     const links = within(nav).getAllByRole('link')
 
@@ -26,7 +35,7 @@ describe('SiteNav', () => {
   })
 
   it('places the name/title before the links in the DOM, so it heads the stack below sm', () => {
-    render(<SiteNav />)
+    renderNav()
     const title = screen.getByText(TITLE_PREFIX, { exact: false })
     const firstLink = screen.getAllByRole('link')[0]
 
@@ -34,7 +43,7 @@ describe('SiteNav', () => {
   })
 
   it('keeps the title first at every breakpoint, so it heads the stack below sm and sits left-anchored at sm', () => {
-    render(<SiteNav />)
+    renderNav()
     // getByText matches CyclingTitle's inner "text-white" span (the
     // immediate text-holding element); its parent is CyclingTitle's own
     // root span, which is what nav.tsx's order-1 class lands on.
@@ -44,7 +53,7 @@ describe('SiteNav', () => {
   })
 
   it('gives the name/title a border below sm, so it reads as a header rather than another link', () => {
-    render(<SiteNav />)
+    renderNav()
     const titleRoot = screen.getByText(TITLE_PREFIX, { exact: false }).parentElement!
 
     expect(titleRoot).toHaveClass('border-b')
