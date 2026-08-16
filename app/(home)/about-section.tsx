@@ -2,7 +2,14 @@ import Image from 'next/image'
 import { getPokemonArtworkUrl } from './pokemon-artwork'
 import { ScrollReveal } from './scroll-reveal'
 
-const ABOUT_PARAGRAPH = `I shipped Swapmeat on Steam, now localized in 6 languages. That project is where localization stopped being an abstract interest and became the thing I actually want to work on — figuring out how a game, a campaign, or a tool holds up when it's no longer just built for one language or one market. I like the technical side of that problem as much as the human side: the pipelines and automation that make it scalable, and the judgment calls that keep it feeling natural instead of translated. That's the kind of work I'm looking to keep doing.`
+// The childhood-origin story leads, with the Swapmeat paragraph kept below
+// it as where that origin led — the photo alongside them is still the
+// Swapmeat Steam screenshot, so the second paragraph is what still ties it
+// to what's actually pictured.
+const ABOUT_PARAGRAPHS = [
+  `I started figuring out that I wanted to work in localization before I even knew what it was: it was 1998, I was 6 years old, and I was playing Pokemon Yellow Version on my purple GameBoy Color. This text-heavy game was rapidly improving my ability to read. I was fascinated with the franchise, I was learning about where it came from in Japan, and I was discovering what it really meant to speak another language. Eventually I'd grow up to play more Pokemon games in Japanese, French, and Spanish.`,
+  `Fast-forwarding to my professional career, I shipped Swapmeat on Steam, localized in 6 languages. Swapmeat is the project that solidified localization as the piece I really want to work on — figuring out how a game, a campaign, or a tool holds up when it's no longer just built for one language or one market. I like the technical side of that problem as much as the human side: the pipelines and automation that make it scalable, and the judgment calls that keep it feeling natural instead of translated. That's the kind of work I'm looking to keep doing.`,
+]
 
 // The team's own six Pokémon (top row, left-aligned) and the six they're
 // each paired against (bottom row, right-aligned) — the same twelve
@@ -119,9 +126,15 @@ export async function AboutSection() {
             className="about-photo w-[460px] max-w-full rounded-lg"
           />
 
-          <p className="about-para text-right text-base leading-relaxed text-neutral-500 sm:text-lg">
-            {ABOUT_PARAGRAPH}
-          </p>
+          {/* .about-para is a single named grid area (see globals.css), so
+              both paragraphs live inside one wrapper occupying it rather
+              than each carrying the class themselves — two grid items both
+              claiming the same area would just overlap. */}
+          <div className="about-para space-y-4 text-right text-sm leading-relaxed text-neutral-500 sm:text-base">
+            {ABOUT_PARAGRAPHS.map((para) => (
+              <p key={para.slice(0, 24)}>{para}</p>
+            ))}
+          </div>
         </ScrollReveal>
 
         {/* The opponents each team Pokémon above was paired against on its

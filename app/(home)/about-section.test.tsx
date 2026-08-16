@@ -40,21 +40,21 @@ describe('AboutSection', () => {
     expect(screen.getByRole('heading', { name: 'About' })).toBeInTheDocument()
   })
 
-  it('places the heading, photo, and paragraph in that reading order in the DOM', async () => {
+  it('places the heading, photo, and paragraphs in that reading order in the DOM', async () => {
     render(await AboutSection())
 
     const heading = screen.getByRole('heading', { name: 'About' })
     const photo = screen.getByAltText('Swap Meat on Steam')
-    const paragraph = screen.getByText(/I shipped Swapmeat on Steam/)
+    const paragraphs = screen.getByText(/I started figuring out/)
 
     // DOCUMENT_POSITION_FOLLOWING means the argument comes *after* the node
     // compareDocumentPosition was called on. This is the DOM/reading order
-    // (heading, then photo, then paragraph) — below lg that also happens to
+    // (heading, then photo, then paragraphs) — below lg that also happens to
     // be the visual stacking order, but at lg the .about-layout grid (see
     // globals.css) moves the photo to the left of both via CSS grid areas,
     // which jsdom doesn't evaluate; see the class-based test below for that.
     expect(heading.compareDocumentPosition(photo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(photo.compareDocumentPosition(paragraph) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(photo.compareDocumentPosition(paragraphs) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('assigns each piece its own named grid area, so the lg layout (see globals.css) can move the photo independently', async () => {
@@ -62,7 +62,21 @@ describe('AboutSection', () => {
 
     expect(screen.getByRole('heading', { name: 'About' })).toHaveClass('about-title')
     expect(screen.getByAltText('Swap Meat on Steam')).toHaveClass('about-photo')
-    expect(screen.getByText(/I shipped Swapmeat on Steam/)).toHaveClass('about-para')
+    // Both paragraphs share one grid area (see the note on about-section.tsx
+    // for why), so the class lives on their shared wrapper, not on either
+    // <p> itself.
+    expect(screen.getByText(/I started figuring out/).closest('.about-para')).not.toBeNull()
+  })
+
+  it('renders the childhood-origin paragraph before the Swapmeat paragraph, both in the shared grid area', async () => {
+    render(await AboutSection())
+
+    const wrapper = screen.getByText(/I started figuring out/).closest('.about-para') as HTMLElement
+    const paragraphs = wrapper.querySelectorAll('p')
+
+    expect(paragraphs).toHaveLength(2)
+    expect(paragraphs[0].textContent).toMatch(/^I started figuring out/)
+    expect(paragraphs[1].textContent).toMatch(/^Fast-forwarding to my professional career/)
   })
 
   it('renders the six team sprites, left-aligned above the heading, in the same order ProjectsSection used to', async () => {
