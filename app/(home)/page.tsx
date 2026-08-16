@@ -31,7 +31,7 @@ export default function HomePage() {
           scroll-margin-top on it (unlike the sections below), since the hero
           already starts at the literal top of the page and the fixed nav is
           *meant* to overlay its first ~90px rather than be cleared. */}
-      <section id="home" className="relative min-h-screen overflow-hidden bg-black lg:h-screen">
+      <section id="home" className="relative min-h-dvh overflow-hidden bg-black lg:h-dvh">
         {/* The photo runs from the very top of the hero — the opaque navbar
             covers its first ~90px, so it still reads as starting beneath the
             nav without the layout having to know how tall the nav is.

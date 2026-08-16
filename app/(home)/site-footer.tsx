@@ -65,6 +65,9 @@ export function SiteFooter() {
         <p className="mt-8 text-neutral-400">
           © {new Date().getFullYear()} MIT Licensed
         </p>
+        <p className="mt-2 text-sm text-neutral-500">
+          Pokémon images via PokéAPI, © Nintendo/Game Freak
+        </p>
       </div>
     </footer>
   )
