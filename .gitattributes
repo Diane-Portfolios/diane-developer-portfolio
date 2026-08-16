@@ -1,0 +1,34 @@
+# Git LFS — scoped to public/assets/ on purpose.
+#
+# These patterns are deliberately NOT global (e.g. plain "*.png"). A global rule
+# would also swallow app/favicon.ico and any future images committed elsewhere,
+# and converting an already-committed file to LFS requires rewriting history.
+# Keeping large binaries in one directory keeps that from happening by accident.
+#
+# SVG is intentionally absent: it's text, it diffs well, and it's almost always
+# small enough that LFS costs more than it saves.
+
+# Raster images
+public/assets/**/*.png  filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.jpg  filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.gif  filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.webp filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.avif filter=lfs diff=lfs merge=lfs -text
+
+# Video
+public/assets/**/*.mp4  filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.webm filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.mov  filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.m4v  filter=lfs diff=lfs merge=lfs -text
+
+# Animation formats (Rive, Lottie)
+public/assets/**/*.riv    filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.lottie filter=lfs diff=lfs merge=lfs -text
+# Lottie JSON only inside animations/ — a broad "*.json" rule would catch
+# package.json, tsconfig.json, and every other config file in the repo.
+public/assets/animations/**/*.json filter=lfs diff=lfs merge=lfs -text
+
+# Audio
+public/assets/**/*.mp3 filter=lfs diff=lfs merge=lfs -text
+public/assets/**/*.wav filter=lfs diff=lfs merge=lfs -text

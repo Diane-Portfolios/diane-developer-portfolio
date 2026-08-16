@@ -4,7 +4,13 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import { highlight } from 'sugar-high'
 import React from 'react'
 
-function Table({ data }: { data: { headers: string[]; rows: string[][] } }) {
+// These are exported individually (in addition to being wired into
+// CustomMDX's `components` map below) so they're unit-testable directly.
+// CustomMDX itself renders via MDXRemote from next-mdx-remote/rsc, an async
+// Server Component built for Next's RSC pipeline — it can't be rendered
+// through a plain client-side render() outside that pipeline, so these
+// pieces are what's actually testable in isolation.
+export function Table({ data }: { data: { headers: string[]; rows: string[][] } }) {
   let headers = data.headers.map((header, index) => (
     <th key={index}>{header}</th>
   ))
@@ -26,7 +32,7 @@ function Table({ data }: { data: { headers: string[]; rows: string[][] } }) {
   )
 }
 
-function CustomLink(props: any) {
+export function CustomLink(props: any) {
   let href = props.href
 
   if (href.startsWith('/')) {
@@ -44,16 +50,16 @@ function CustomLink(props: any) {
   return <a target="_blank" rel="noopener noreferrer" {...props} />
 }
 
-function RoundedImage(props: any) {
+export function RoundedImage(props: any) {
   return <Image alt={props.alt} className="rounded-lg" {...props} />
 }
 
-function Code({ children, ...props }: { children: string; [key: string]: any }) {
+export function Code({ children, ...props }: { children: string; [key: string]: any }) {
   let codeHTML = highlight(children)
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />
 }
 
-function slugify(str: string) {
+export function slugify(str: string) {
   return str
     .toString()
     .toLowerCase()
@@ -64,7 +70,7 @@ function slugify(str: string) {
     .replace(/\-\-+/g, '-') // Replace multiple - with single -
 }
 
-function createHeading(level: number) {
+export function createHeading(level: number) {
   const Heading = ({ children }: { children: string }) => {
     let slug = slugify(children)
     return React.createElement(

@@ -1,14 +1,13 @@
 import Link from 'next/link'
 
-const navItems = {
-  '/': {
-    name: 'home',
-  },
-  '/blog': {
+// This is the old site's own nav now — the redesign graduated to the real
+// homepage (app/(home)) and has its own anchor-based nav. The old home and
+// contact pages are gone (superseded by the new site's own About/Experience
+// and ContactSection), leaving only the blog, which still needs a way back to
+// its own listing from an individual post.
+export const navItems = {
+  '/old-site/blog': {
     name: 'projects',
-  },
-  '/contact': {
-    name: 'contact',
   },
 }
 

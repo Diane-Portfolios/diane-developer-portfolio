@@ -31,6 +31,82 @@
 
 html {
   min-width: 360px;
+  /* The homepage nav scrolls to in-page sections (#about, #experience, etc.)
+     via plain <a href="#..."> rather than any JS scroll call, so this is what
+     makes those jumps glide instead of snapping instantly. Turned back off
+     under prefers-reduced-motion below. */
+  scroll-behavior: smooth;
+}
+
+/* Feeds the console's width limit in console-geometry.ts (SIZE). Below lg the
+   hero is a single column and the console is sized off the full viewport
+   width; at lg (1024px) and up it moves into its own half of a 2-column
+   layout, so it only has roughly half the viewport to work with. A plain CSS
+   custom property is the only way to express that "different value above a
+   breakpoint" for a number that's consumed by a JS-computed inline style
+   rather than a class. */
+:root {
+  --console-max-w: 122vw;
+  /* Below lg the hero also stacks the About/location text above the
+     console (see page.tsx), so the console can no longer claim the whole
+     screen height the way it could when it was the hero's only content. */
+  --console-max-h: 42vh;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --console-max-w: 40vw;
+    /* Also caps the console's height at lg+ (see console-geometry.ts's
+       SIZE) — at full hero height (73vh) it dwarfed the text column beside
+       it; a smaller console reads as a more even match for it. */
+    --console-max-h: 58vh;
+  }
+}
+
+/* About section (see about-section.tsx): below lg the photo sits *between*
+   the heading and the paragraph in one stacked column; at lg it moves to
+   their *left*, beside a two-row text column instead. That's a reshuffle
+   from 3 stacked items into 1-beside-2, which plain flexbox `order` can't
+   express — order only resequences items within a single row/column, it
+   can't regroup them. Named grid areas just say where each piece sits at
+   each breakpoint, with no wrapper/duplication needed. */
+.about-layout {
+  display: grid;
+  grid-template-areas: 'title' 'photo' 'para';
+  row-gap: 1.5rem;
+  /* Matches Tailwind's max-w-xl. width:fit-content (not the default auto)
+     so unused space doesn't sit inside the box — the box needs to actually
+     shrink to its content for the column's own ml-auto to have anything to
+     push right within. */
+  width: fit-content;
+  max-width: 36rem;
+  justify-items: end;
+}
+
+.about-title {
+  grid-area: title;
+}
+
+.about-photo {
+  grid-area: photo;
+}
+
+.about-para {
+  grid-area: para;
+}
+
+@media (min-width: 1024px) {
+  .about-layout {
+    grid-template-columns: auto 36rem;
+    grid-template-areas: 'photo title' 'photo para';
+    column-gap: 2rem;
+    align-items: center;
+    max-width: none;
+    /* title/para should fill their 36rem column so text-right lands on the
+       column's true right edge, not wherever their own content happens to
+       end. */
+    justify-items: stretch;
+  }
 }
 
 .prose .anchor {
@@ -121,6 +197,31 @@ html {
   margin-bottom: 1.25em !important;
 }
 
+/* .prose's colors above follow the *system's* prefers-color-scheme via its
+   dark: variants, which is correct for the old site (it actually supports
+   light mode). The homepage's project modal is always dark regardless of
+   system preference, so on a light-mode system .prose's un-prefixed (light-
+   mode) colors would apply against the modal's dark panel — e.g. .prose p's
+   text-neutral-800 read at low contrast on black, and .prose pre's
+   bg-neutral-50 would render as a near-white code block. Pairing this class
+   alongside .prose forces the same colors the dark: variants would give,
+   unconditionally. */
+.prose-invert.prose a {
+  @apply decoration-neutral-600;
+}
+
+.prose-invert.prose .anchor:after {
+  @apply text-neutral-700;
+}
+
+.prose-invert.prose pre {
+  @apply bg-neutral-900 border-neutral-900;
+}
+
+.prose-invert.prose p {
+  @apply text-neutral-200;
+}
+
 pre::-webkit-scrollbar {
   display: none;
 }
@@ -147,4 +248,153 @@ table {
 
 .title {
   text-wrap: balance;
+}
+
+/* --- /new-site entrance animations ---------------------------------------
+   Pure CSS, so they run on first paint with no client JS and no hydration
+   flash. `both` fill-mode holds the from-state before the delay elapses,
+   which is what staggers the navbar ahead of the console. */
+
+@keyframes ns-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ns-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ns-enter-nav {
+  animation: ns-fade-down 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* Applied to the image *inside* the positioning wrapper. The wrapper owns the
+   centring translate; if this animated transform lived on the same element it
+   would overwrite it and knock the screen off-centre mid-animation. */
+.ns-enter-gameboy {
+  animation: ns-fade-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+}
+
+/* Entrance for the two side blocks. Applied to an inner wrapper, never to the
+   positioned element itself — those carry a centring -translate-y-1/2 that an
+   animated transform would overwrite. Delay is set inline so the two can be
+   staggered without a class each. */
+@keyframes ns-fade-in-side {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ns-enter-side {
+  animation: ns-fade-in-side 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Scroll-triggered reveal for sections below the hero (see scroll-reveal.tsx).
+   A transition rather than a keyframe animation: the hero's ns-enter-* rules
+   start automatically at mount, but this one has to sit inert until JS adds
+   .ns-reveal-visible once the block has actually scrolled into view. */
+.ns-reveal {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ns-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Rotating text. Every rotating element runs one infinite animation of the same
+   duration; only the keyframe name differs, and that name encodes which slots
+   the element is visible for. Because they share a duration and start together,
+   the navbar role and the work location can never fall out of step.
+
+   The @keyframes themselves are generated in ./new-site/rotation.ts and injected
+   by the page — the percentages depend on the slot count and fade length, and
+   deriving them here by hand would go stale the moment those change. */
+.ns-rot,
+.ns-rot-default {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: none;
+}
+
+.ns-rot {
+  opacity: 0;
+}
+
+/* Whatever should survive with animation switched off — the English entries. */
+.ns-rot-default {
+  opacity: 1;
+}
+
+/* Stacks every state into a single grid cell, so the box is as wide and tall as
+   its largest state and nothing reflows as they cross. */
+.ns-cycle-stack {
+  display: grid;
+  /* Which edge the stacked states align to. `start` keeps the navbar's roles
+     butted against the name; other callers can override. */
+  --ns-stack-align: start;
+}
+
+.ns-cycle-stack > * {
+  grid-area: 1 / 1;
+  justify-self: var(--ns-stack-align);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    /* Anchor-nav jumps snap instantly instead of gliding — a multi-section
+       scroll animation is exactly the motion this setting asks to remove. */
+    scroll-behavior: auto;
+  }
+
+  .ns-enter-nav,
+  .ns-enter-gameboy,
+  .ns-enter-side,
+  .ns-rot,
+  .ns-rot-default {
+    /* !important is load-bearing here, not defensive. Each rotating element
+       carries its keyframe name in an inline style attribute, and inline styles
+       outrank stylesheet rules — without this the rotation keeps running under
+       reduced motion and the page settles on whatever language it happens to be
+       mid-loop. */
+    animation: none !important;
+  }
+
+  /* Scroll reveals show immediately, in place, rather than sliding up when
+     the observer fires — the movement is exactly what this setting asks for
+     less of. The block still starts at opacity 0 in JS-disabled browsers
+     (there's no toggle to add .ns-reveal-visible), so this also covers that
+     case: content must not depend on JS to become visible. */
+  .ns-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* With the rotation stopped these keep their base opacity, so only the
+     English entries remain — a continuous loop is exactly the kind of motion
+     this setting asks you to stop. */
 }
