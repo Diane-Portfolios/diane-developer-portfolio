@@ -62,9 +62,23 @@ export default function HomePage() {
             below lg) drops out of layout entirely, leaving the console as
             the grid's only item, centred on the full width exactly as
             before. One console, rendered once — its position comes from
-            which grid it's sitting in, not from two copies of its markup. */}
-        <div className="relative z-10 grid h-full grid-cols-1 place-items-center lg:grid-cols-2 lg:gap-x-12 xl:gap-x-24">
-          <div className="hidden flex-col items-center gap-10 lg:flex">
+            which grid it's sitting in, not from two copies of its markup.
+            lg:-translate-x-[5%]: with equal 50/50 columns, the console
+            (centred in the right half) sits at 75% of the viewport while the
+            text (pulled to the gutter) sits just left of centre — so the
+            pair's actual midpoint lands well right of centre. Nudging the
+            whole grid left re-centres that midpoint without touching either
+            column's own alignment or the gap between them. */}
+        <div className="relative z-10 grid h-full grid-cols-1 place-items-center lg:grid-cols-2 lg:gap-x-6 lg:-translate-x-[5%] xl:gap-x-10">
+          {/* items-start (not -center): the text inside is left-aligned now,
+              so the column itself should hug that same left edge rather than
+              centring a left-aligned block. lg:justify-self-end pulls the
+              whole column to the right edge of its grid cell — the side
+              nearest the console — since a left-aligned block would
+              otherwise drift toward the *outer* edge of the viewport instead
+              of the gutter, working against wanting it closer to the console
+              rather than farther. */}
+          <div className="hidden flex-col items-start gap-10 lg:flex lg:justify-self-end">
             <AboutNote />
             <LocationNote />
           </div>

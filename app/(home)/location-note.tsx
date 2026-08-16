@@ -39,13 +39,12 @@ export function LocationNote() {
   const codes = [...new Set(SEQUENCE)]
 
   return (
-    <div className="ns-enter-side text-center" style={{ animationDelay: '0.7s' }}>
+    <div className="ns-enter-side text-left" style={{ animationDelay: '0.7s' }}>
       {/* All label states share one grid cell, so the lines below can't be
-          nudged as they cross. [--ns-stack-align:center] overrides the
-          shared .ns-cycle-stack default (start-aligned, right for the navbar
-          role sitting next to a fixed name) — this block is centred, not
-          hugging an edge. */}
-      <div className="ns-cycle-stack [--ns-stack-align:center] text-lg text-neutral-300">
+          nudged as they cross. .ns-cycle-stack's default --ns-stack-align
+          (start) is exactly what's wanted here — left-aligned, no override
+          needed. */}
+      <div className="ns-cycle-stack text-lg text-neutral-300">
         {codes.map((code) => (
           <span
             key={code}
@@ -61,7 +60,7 @@ export function LocationNote() {
 
       {/* Both place states share one cell so the block keeps one width and the
           lines stay on the same baselines through the Czech substitution. */}
-      <div className="ns-cycle-stack [--ns-stack-align:center] text-4xl font-semibold tracking-tight text-white">
+      <div className="ns-cycle-stack text-4xl font-semibold tracking-tight text-white">
         {/* Visible for every slot that isn't Czech. Its keyframes hold opacity
             at 1 straight through consecutive slots rather than fading at each
             boundary — otherwise identical text would pulse every few seconds. */}

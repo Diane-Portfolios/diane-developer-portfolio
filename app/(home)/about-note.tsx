@@ -14,7 +14,7 @@ const ABOUT = [
 // the page that never rotates.
 export function AboutNote() {
   return (
-    <div className="ns-enter-side max-w-[22rem] text-center" style={{ animationDelay: '0.55s' }}>
+    <div className="ns-enter-side max-w-[22rem] text-left" style={{ animationDelay: '0.55s' }}>
       <h2 className="text-4xl font-semibold tracking-tight text-white">{NAME}</h2>
 
       <div className="mt-4 space-y-3 text-sm leading-[1.7] text-neutral-300">
