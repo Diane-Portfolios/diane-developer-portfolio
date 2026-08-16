@@ -363,6 +363,21 @@ table {
   white-space: nowrap;
 }
 
+/* Multi-line variant, for stacked states long enough to need wrapping (e.g. a
+   paragraph) rather than the single-line labels the plain stack was built
+   for. justify-self: stretch fills the cell's own inline size instead of
+   shrinking to each state's content width, and min-width: 0 overrides the
+   grid item's default min-width: auto — without it a wrapped text item's
+   min-content width still contributes its longest *word*, but its max-content
+   (unwrapped) width sizes the grid track, which blows the cell out past the
+   container to fit the longest state on one line instead of wrapping any of
+   them. */
+.ns-cycle-stack--wrap > * {
+  justify-self: stretch;
+  min-width: 0;
+  white-space: normal;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     /* Anchor-nav jumps snap instantly instead of gliding — a multi-section
