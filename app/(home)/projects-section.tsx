@@ -76,7 +76,11 @@ function Sprite({
 // title renders in the pill itself for now (no subtitle yet); the full
 // post — same title, date, and MDX body the old blog page rendered — opens
 // in ProjectLabel's popup on click.
-async function PillRow({
+// Exported (in addition to being used internally by ProjectsSection) so it's
+// directly testable — as an async Server Component it can only be invoked as
+// a plain function and awaited, not rendered via JSX through a normal client
+// render tree.
+export async function PillRow({
   leftPokemon,
   rightPokemon,
   flipLeftSprite,
