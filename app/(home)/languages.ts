@@ -1,11 +1,13 @@
 // Shared by the sidebar list and the on-screen language menu so the two can't
-// drift apart.
+// drift apart. English leads the list — it's the menu's own reset target
+// (see GameBoyMenu) as well as a selectable row — with `native` == `en` since
+// there's no separate native form to swap in for it.
 //
-// `en` shows first in the sidebar; `native` replaces it at the swap. Casing on
-// the native side follows each language's own convention rather than being
-// forced to title case: only German capitalises its language name, so the rest
-// are correctly lowercase.
+// Casing on the native side follows each language's own convention rather
+// than being forced to title case: only German capitalises its language
+// name, so the rest are correctly lowercase.
 export const LANGUAGES = [
+  { en: 'English', native: 'English', lang: 'en' },
   { en: 'Spanish', native: 'español', lang: 'es' },
   { en: 'French', native: 'français', lang: 'fr' },
   { en: 'Portuguese', native: 'português', lang: 'pt' },

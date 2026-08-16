@@ -1,6 +1,8 @@
 import { act, render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { GameBoyControls } from './gameboy-controls'
 import { GameBoyScreen } from './gameboy-screen'
+import { LanguageProvider } from './language-context'
 
 // jsdom's HTMLMediaElement.play() throws "not implemented" — the
 // reduced-motion path never calls it (only .pause()), which is what makes
@@ -48,7 +50,11 @@ describe('GameBoyScreen (prefers-reduced-motion)', () => {
   })
 
   it('renders the video and the menu overlay, with the menu hidden until the hold elapses', () => {
-    const { container } = render(<GameBoyScreen />)
+    const { container } = render(
+      <LanguageProvider>
+        <GameBoyScreen />
+      </LanguageProvider>
+    )
 
     expect(container.querySelector('video')).toBeInTheDocument()
     const menuWrapper = container.querySelector('video')!.nextElementSibling as HTMLElement
@@ -56,7 +62,11 @@ describe('GameBoyScreen (prefers-reduced-motion)', () => {
   })
 
   it('reveals the menu (crossfades in) after the hold duration', () => {
-    const { container } = render(<GameBoyScreen />)
+    const { container } = render(
+      <LanguageProvider>
+        <GameBoyScreen />
+      </LanguageProvider>
+    )
     const menuWrapper = container.querySelector('video')!.nextElementSibling as HTMLElement
 
     // HOLD_MS is 3000 in the component; advancing well past it should be
@@ -69,7 +79,28 @@ describe('GameBoyScreen (prefers-reduced-motion)', () => {
   })
 
   it('cleans up its timer on unmount without throwing', () => {
-    const { unmount } = render(<GameBoyScreen />)
+    const { unmount } = render(
+      <LanguageProvider>
+        <GameBoyScreen />
+      </LanguageProvider>
+    )
     expect(() => unmount()).not.toThrow()
+  })
+
+  it('enables the D-pad/B overlay only once the hold elapses and the menu is showing', () => {
+    const { getByRole } = render(
+      <LanguageProvider>
+        <GameBoyScreen />
+        <GameBoyControls />
+      </LanguageProvider>
+    )
+    const upButton = getByRole('button', { name: /move language selection up/i })
+    expect(upButton).toBeDisabled()
+
+    act(() => {
+      vi.advanceTimersByTime(5000)
+    })
+
+    expect(upButton).not.toBeDisabled()
   })
 })

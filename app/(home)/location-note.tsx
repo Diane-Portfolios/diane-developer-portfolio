@@ -1,4 +1,6 @@
-import { NON_CZECH_NAME, SEQUENCE, TOTAL_MS, rotationStyle } from './rotation'
+'use client'
+
+import { useLanguage } from './language-context'
 
 // Static for every language except Czech, which declines them (see below).
 const PLACES = ['Seattle, WA', 'Chicago, IL']
@@ -6,8 +8,7 @@ const PLACES = ['Seattle, WA', 'Chicago, IL']
 // Czech puts these in the locative case after "v", so the place names
 // themselves change: Seattle -> Seattlu, Chicago -> Chicagu. The preposition
 // rides along here rather than on the label, which leaves the label as the bare
-// verb. This is the only point in the rotation where the place lines are not
-// the plain English ones.
+// verb.
 const CZECH_PLACES = ['v Seattlu', 'v Chicagu']
 
 // PLACEHOLDER TRANSLATIONS — not native-reviewed.
@@ -32,60 +33,23 @@ const LABEL_BY_LANG: Record<string, string> = {
 }
 
 // Bottom half of the hero's left column (see page.tsx), stacked below
-// AboutNote. The label rotates on the same clock as the navbar role, so the
-// two always show the same language; the place names hold still throughout,
-// apart from the Czech slots.
+// AboutNote. The label shows whatever language the Game Boy's D-pad
+// currently has selected, same as the navbar role, so the two always match;
+// the place names hold still except for the Czech declension.
 export function LocationNote() {
-  const codes = [...new Set(SEQUENCE)]
+  const { language } = useLanguage()
+  const places = language === 'cs' ? CZECH_PLACES : PLACES
 
   return (
     <div className="ns-enter-side text-left" style={{ animationDelay: '0.7s' }}>
-      {/* All label states share one grid cell, so the lines below can't be
-          nudged as they cross. .ns-cycle-stack's default --ns-stack-align
-          (start) is exactly what's wanted here — left-aligned, no override
-          needed. */}
-      <div className="ns-cycle-stack text-lg text-neutral-300">
-        {codes.map((code) => (
-          <span
-            key={code}
-            className={code === 'en' ? 'ns-rot-default' : 'ns-rot'}
-            aria-hidden={code === 'en' ? undefined : 'true'}
-            lang={code === 'en' ? undefined : code}
-            style={rotationStyle(code)}
-          >
-            {LABEL_BY_LANG[code]}
-          </span>
-        ))}
+      <div className="text-lg text-neutral-300" lang={language === 'en' ? undefined : language}>
+        {LABEL_BY_LANG[language]}
       </div>
 
-      {/* Both place states share one cell so the block keeps one width and the
-          lines stay on the same baselines through the Czech substitution. */}
-      <div className="ns-cycle-stack text-4xl font-semibold tracking-tight text-white">
-        {/* Visible for every slot that isn't Czech. Its keyframes hold opacity
-            at 1 straight through consecutive slots rather than fading at each
-            boundary — otherwise identical text would pulse every few seconds. */}
-        <div
-          className="ns-rot-default"
-          style={{
-            animationName: NON_CZECH_NAME,
-            animationDuration: `${TOTAL_MS}ms`,
-          }}
-        >
-          {PLACES.map((place) => (
-            <p key={place}>{place}</p>
-          ))}
-        </div>
-
-        <div
-          aria-hidden="true"
-          lang="cs"
-          className="ns-rot"
-          style={rotationStyle('cs')}
-        >
-          {CZECH_PLACES.map((place) => (
-            <p key={place}>{place}</p>
-          ))}
-        </div>
+      <div className="text-4xl font-semibold tracking-tight text-white" lang={language === 'cs' ? 'cs' : undefined}>
+        {places.map((place) => (
+          <p key={place}>{place}</p>
+        ))}
       </div>
     </div>
   )

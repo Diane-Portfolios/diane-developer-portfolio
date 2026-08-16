@@ -324,43 +324,24 @@ table {
   transform: translateY(0);
 }
 
-/* Rotating text. Every rotating element runs one infinite animation of the same
-   duration; only the keyframe name differs, and that name encodes which slots
-   the element is visible for. Because they share a duration and start together,
-   the navbar role and the work location can never fall out of step.
-
-   The @keyframes themselves are generated in ./new-site/rotation.ts and injected
-   by the page — the percentages depend on the slot count and fade length, and
-   deriving them here by hand would go stale the moment those change. */
-.ns-rot,
-.ns-rot-default {
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-fill-mode: none;
+/* Gentle "press me" pulse behind the Game Boy's D-pad/B hit regions (see
+   gameboy-controls.tsx) — signals they're clickable without needing a
+   static outline drawn over the artwork. Only ever active once the console
+   has finished booting; the component itself fades the whole glow in/out
+   for that via a separate opacity transition (see the comment there for why
+   that's a second element rather than fighting this animation on one). */
+@keyframes ns-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
-.ns-rot {
-  opacity: 0;
-}
-
-/* Whatever should survive with animation switched off — the English entries. */
-.ns-rot-default {
-  opacity: 1;
-}
-
-/* Stacks every state into a single grid cell, so the box is as wide and tall as
-   its largest state and nothing reflows as they cross. */
-.ns-cycle-stack {
-  display: grid;
-  /* Which edge the stacked states align to. `start` keeps the navbar's roles
-     butted against the name; other callers can override. */
-  --ns-stack-align: start;
-}
-
-.ns-cycle-stack > * {
-  grid-area: 1 / 1;
-  justify-self: var(--ns-stack-align);
-  white-space: nowrap;
+.ns-controls-glow {
+  animation: ns-glow-pulse 2.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -373,14 +354,13 @@ table {
   .ns-enter-nav,
   .ns-enter-gameboy,
   .ns-enter-side,
-  .ns-rot,
-  .ns-rot-default {
-    /* !important is load-bearing here, not defensive. Each rotating element
-       carries its keyframe name in an inline style attribute, and inline styles
-       outrank stylesheet rules — without this the rotation keeps running under
-       reduced motion and the page settles on whatever language it happens to be
-       mid-loop. */
+  .ns-controls-glow {
+    /* Static rather than off entirely — the glow itself (not just its
+       motion) is what signals the buttons are clickable, so reduced motion
+       should drop the pulsing, not the affordance. Settles on the
+       keyframes' peak opacity, the most visible frame of the pulse. */
     animation: none !important;
+    opacity: 1;
   }
 
   /* Scroll reveals show immediately, in place, rather than sliding up when
@@ -393,8 +373,4 @@ table {
     transform: none;
     transition: none;
   }
-
-  /* With the rotation stopped these keep their base opacity, so only the
-     English entries remain — a continuous loop is exactly the kind of motion
-     this setting asks you to stop. */
 }
