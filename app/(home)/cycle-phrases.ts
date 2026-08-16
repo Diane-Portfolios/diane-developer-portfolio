@@ -1,5 +1,7 @@
-// Held in English for the whole rotation — only the role after it changes.
-export const TITLE_PREFIX = 'Diane Stephani -'
+// Held in English for the whole rotation — only the role below it changes.
+// No trailing dash: the name and role now sit on their own stacked lines
+// rather than sharing one, so a connector between them would dangle.
+export const TITLE_PREFIX = 'Diane Stephani'
 
 // The navbar role, keyed by language. Rotation order lives in ./rotation.
 //
