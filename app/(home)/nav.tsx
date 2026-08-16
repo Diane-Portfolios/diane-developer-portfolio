@@ -33,13 +33,21 @@ export function SiteNav() {
       {/* The whole row fades in together — the rotating title included, now
           that a slot runs long enough for the entrance not to eat into it. */}
       <div className="ns-enter-nav mx-auto flex max-w-6xl flex-col gap-1 px-4 pb-4 pt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
+        {/* order-1/order-2 rather than relying on DOM order: below sm the
+            name/title reads as a heading for the links underneath it, so it
+            needs to come first visually even though it stays second in the
+            markup (and second — after the links — in the sm:flex-row
+            layout, where DOM order already matches). A border under it only
+            below sm gives it a distinct "header" weight instead of reading
+            as just another nav item. */}
+        <CyclingTitle className="order-1 mb-2 border-b border-white/10 pb-3 text-base font-semibold sm:order-2 sm:mb-0 sm:mr-[1cm] sm:border-none sm:pb-0 sm:text-base sm:font-normal md:text-lg" />
         {/* Tighter margin/padding/text below sm: at the default size all 5
             links ran wider than a narrow phone screen and clipped past the
             edge. flex-wrap as a last resort, not the primary fix — the
             tighter sizing already fits every phone width tested; wrap just
             means an unusually large system font never re-introduces the
             clip. */}
-        <div className="-ml-1.5 flex flex-row flex-wrap sm:-ml-[8px] sm:flex-nowrap">
+        <div className="order-2 -ml-1.5 flex flex-row flex-wrap sm:order-1 sm:-ml-[8px] sm:flex-nowrap">
           {SITE_NAV_ITEMS.map(({ id, name }) => (
             <a
               key={id}
@@ -50,8 +58,6 @@ export function SiteNav() {
             </a>
           ))}
         </div>
-        {/* Nudged in from the right edge to give the longest phrases room. */}
-        <CyclingTitle className="text-xs sm:mr-[1cm] sm:text-base md:text-lg" />
       </div>
     </nav>
   )

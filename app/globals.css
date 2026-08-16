@@ -47,6 +47,10 @@ html {
    rather than a class. */
 :root {
   --console-max-w: 122vw;
+  /* Below lg the hero also stacks the About/location text above the
+     console (see page.tsx), so the console can no longer claim the whole
+     screen height the way it could when it was the hero's only content. */
+  --console-max-h: 42vh;
 }
 
 @media (min-width: 1024px) {

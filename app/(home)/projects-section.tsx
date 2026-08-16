@@ -70,10 +70,15 @@ function Sprite({
 //
 // projectSlug looks the post up from the old site's own blog posts
 // (app/old-site/blog/posts/*.mdx) via the same getBlogPosts() that site
-// still uses — one real source of content instead of a second copy. Only the
-// title renders in the pill itself for now (no subtitle yet); the full
-// post — same title, date, and MDX body the old blog page rendered — opens
-// in ProjectLabel's popup on click.
+// still uses — one real source of content instead of a second copy. The full
+// post — title, date, and MDX body the old blog page rendered — opens in
+// ProjectLabel's popup on click.
+//
+// subtitle and titleOverride are deliberately separate from the post's own
+// frontmatter (title/summary): the pill wants a short, punchy line distinct
+// from the blog post's own formal summary, and in Playswapmeat's case a
+// different display title than the post's own — without touching that post's
+// real title, which old-site's blog pages/sitemap/RSS still use as-is.
 // Exported (in addition to being used internally by ProjectsSection) so it's
 // directly testable — as an async Server Component it can only be invoked as
 // a plain function and awaited, not rendered via JSX through a normal client
@@ -83,11 +88,15 @@ export async function PillRow({
   rightPokemon,
   flipLeftSprite,
   projectSlug,
+  subtitle,
+  titleOverride,
 }: {
   leftPokemon: string
   rightPokemon: string
   flipLeftSprite?: boolean
   projectSlug: string
+  subtitle: string
+  titleOverride?: string
 }) {
   const [leftSprites, rightSprites] = await Promise.all([
     getPokemonSprites(leftPokemon),
@@ -154,7 +163,11 @@ export async function PillRow({
           has to own the click/modal behaviour. */}
       {post && (
         <div className="pointer-events-auto min-w-0 flex-1 px-1 text-center sm:absolute sm:left-1/2 sm:top-1/2 sm:flex-none sm:-translate-x-1/2 sm:-translate-y-1/2 sm:px-0">
-          <ProjectLabel title={post.metadata.title} dateLabel={formatDate(post.metadata.publishedAt)}>
+          <ProjectLabel
+            title={titleOverride ?? post.metadata.title}
+            subtitle={subtitle}
+            dateLabel={formatDate(post.metadata.publishedAt)}
+          >
             <CustomMDX source={post.content} />
           </ProjectLabel>
         </div>
@@ -187,9 +200,8 @@ export async function PillRow({
 // text-right to keep the About/Experience/Projects alternation going (About
 // right, Experience left, Projects right) now that Projects has its own
 // section again rather than sharing ExperienceSection's row. Each pill's
-// title is real project content now (see projectSlug on PillRow); only the
-// titles show here so far, ordered to match what was asked for — a subtitle
-// per project can follow later. The plain, unpaired Poké Balls that used to
+// title and subtitle are real project content now (see projectSlug/subtitle
+// on PillRow). The plain, unpaired Poké Balls that used to
 // stack below these (left over from
 // before any pill existed) are gone now that every ball on the page sits
 // inside one.
@@ -228,16 +240,22 @@ export async function ProjectsSection() {
               leftPokemon="typhlosion-hisui"
               rightPokemon="charizard"
               projectSlug="wonderbot-1000"
+              subtitle="An automated social media scraper"
             />
           </ScrollReveal>
 
-          {/* Ceruledge (Fire/Ghost), flipped — paired with Milotic. */}
+          {/* Ceruledge (Fire/Ghost), flipped — paired with Milotic.
+              titleOverride: "Playswapmeat.com" for the pill/modal display —
+              the post's own frontmatter title ("Playswapmeat") stays as-is,
+              still used by old-site's blog listing/page/sitemap/RSS. */}
           <ScrollReveal className="w-full">
             <PillRow
               leftPokemon="ceruledge"
               rightPokemon="milotic"
               flipLeftSprite
               projectSlug="playswapmeat"
+              titleOverride="Playswapmeat.com"
+              subtitle="Marketing website for Swapmeat, by One More Game"
             />
           </ScrollReveal>
 
@@ -249,6 +267,7 @@ export async function ProjectsSection() {
               flipLeftSprite
               // Household OS's post file is named house-ops.mdx.
               projectSlug="house-ops"
+              subtitle="Automated household manager"
             />
           </ScrollReveal>
 
@@ -261,6 +280,7 @@ export async function ProjectsSection() {
               rightPokemon="dragapult"
               flipLeftSprite
               projectSlug="moonbob-money"
+              subtitle="I created crypto and named it after my cat"
             />
           </ScrollReveal>
 
@@ -271,6 +291,7 @@ export async function ProjectsSection() {
               rightPokemon="skeledirge"
               // Laango Scheduling Service's post file is named laango-django.mdx.
               projectSlug="laango-django"
+              subtitle="A scheduling service for translation and interpreting agencies"
             />
           </ScrollReveal>
 
@@ -281,6 +302,7 @@ export async function ProjectsSection() {
               rightPokemon="garchomp"
               flipLeftSprite
               projectSlug="apre-method"
+              subtitle="A calculated approach to progressive overload"
             />
           </ScrollReveal>
         </div>
