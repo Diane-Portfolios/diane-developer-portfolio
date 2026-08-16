@@ -33,22 +33,20 @@ describe('SiteNav', () => {
     expect(title.compareDocumentPosition(firstLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it("flips the title back below the links via order classes at sm, since the DOM order alone would put it first everywhere", () => {
+  it('keeps the title first at every breakpoint, so it heads the stack below sm and sits left-anchored at sm', () => {
     render(<SiteNav />)
     // getByText matches CyclingTitle's inner "text-white" span (the
     // immediate text-holding element); its parent is CyclingTitle's own
-    // root span, which is what nav.tsx's order-1/sm:order-2 classes land on.
+    // root span, which is what nav.tsx's order-1 class lands on.
     const titleRoot = screen.getByText(TITLE_PREFIX, { exact: false }).parentElement!
 
     expect(titleRoot).toHaveClass('order-1')
-    expect(titleRoot).toHaveClass('sm:order-2')
   })
 
-  it('gives the name/title distinct weight from the links below sm, so it reads as a header rather than another link', () => {
+  it('gives the name/title a border below sm, so it reads as a header rather than another link', () => {
     render(<SiteNav />)
     const titleRoot = screen.getByText(TITLE_PREFIX, { exact: false }).parentElement!
 
-    expect(titleRoot).toHaveClass('font-semibold')
     expect(titleRoot).toHaveClass('border-b')
   })
 })

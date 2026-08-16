@@ -14,12 +14,21 @@ describe('CyclingTitle', () => {
     }
   })
 
-  it('stacks the name above the role below sm, and puts them back on one row from sm up', () => {
+  it('stacks the name above the role at every breakpoint', () => {
     render(<CyclingTitle />)
     const titleRoot = screen.getByText(TITLE_PREFIX, { exact: false }).parentElement!
 
     expect(titleRoot).toHaveClass('flex-col')
-    expect(titleRoot).toHaveClass('sm:flex-row')
+    expect(titleRoot).not.toHaveClass('sm:flex-row')
+  })
+
+  it('bolds the name and keeps the role normal-weight, so the two read as distinct lines', () => {
+    render(<CyclingTitle />)
+    const nameEl = screen.getByText(TITLE_PREFIX, { exact: false })
+    const roleStack = document.querySelector('.ns-cycle-stack')!
+
+    expect(nameEl).toHaveClass('font-bold')
+    expect(roleStack).toHaveClass('font-normal')
   })
 
   it('only the English state is exposed to assistive tech; every other language is aria-hidden', () => {

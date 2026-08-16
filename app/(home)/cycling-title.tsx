@@ -9,24 +9,24 @@ export function CyclingTitle({ className = '' }: { className?: string }) {
   const codes = [...new Set(SEQUENCE)]
 
   return (
-    // Stacked below sm — the role drops to its own line under the name
-    // rather than sharing one, so a long phrase in any language has the
-    // nav's full width to run instead of being squeezed beside the name
-    // and risking an overflow/clip on a narrow phone. From sm up it goes
-    // back to one row, items-baseline keeping the name and the role on one
-    // baseline even though the CJK entries have very different metrics
-    // from the Latin ones.
-    <span
-      className={`flex flex-col items-start whitespace-normal sm:inline-flex sm:flex-row sm:items-baseline sm:whitespace-nowrap ${className}`}
-    >
+    // Always stacked — the role sits on its own line under the name at
+    // every breakpoint now, rather than sharing a row from sm up, so a long
+    // phrase in any language has the nav's full width to run instead of
+    // risking an overflow/clip, and the two lines can carry distinct
+    // weights without a shared baseline forcing them together.
+    <span className={`flex flex-col items-start whitespace-normal ${className}`}>
       {/* Rendered once, outside the stack. It is not part of any animation and
-          nothing to its right can resize it, so it cannot move. */}
-      <span className="text-white">{TITLE_PREFIX}&nbsp;</span>
+          nothing below it can resize it, so it cannot move. font-bold is
+          explicit here (not inherited from nav's className) so the name
+          stays bold regardless of what weight the role below ends up at. */}
+      <span className="font-bold text-white">{TITLE_PREFIX}</span>
 
       {/* Fixed-width column: as wide as the longest role, always. The colour
           lives here rather than on each state — without it these inherit the
-          root's light-mode black and vanish against the black navbar. */}
-      <span className="ns-cycle-stack text-neutral-300">
+          root's light-mode black and vanish against the black navbar.
+          font-normal is explicit so the role reads distinctly lighter than
+          the bold name above it, whatever weight nav.tsx's className sets. */}
+      <span className="ns-cycle-stack font-normal text-neutral-300">
         {codes.map((code) => (
           <span
             key={code}
