@@ -87,7 +87,20 @@ export async function ProjectsSection() {
             they render one-by-one while the visitor scrolls down them. */}
         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <ScrollReveal>
+            <ProjectTile projectSlug="union-shift-coverage" />
+          </ScrollReveal>
+
+          {/* Household OS's post file is named house-ops.mdx. */}
+          <ScrollReveal>
+            <ProjectTile projectSlug="house-ops" />
+          </ScrollReveal>
+
+          <ScrollReveal>
             <ProjectTile projectSlug="wonderbot-1000" />
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <ProjectTile projectSlug="moonbob-money" />
           </ScrollReveal>
 
           {/* titleOverride: "Playswapmeat.com" for the tile/modal display —
@@ -97,22 +110,9 @@ export async function ProjectsSection() {
             <ProjectTile projectSlug="playswapmeat" titleOverride="Playswapmeat.com" />
           </ScrollReveal>
 
-          {/* Household OS's post file is named house-ops.mdx. */}
-          <ScrollReveal>
-            <ProjectTile projectSlug="house-ops" />
-          </ScrollReveal>
-
-          <ScrollReveal>
-            <ProjectTile projectSlug="moonbob-money" />
-          </ScrollReveal>
-
           {/* Laango Scheduling Service's post file is named laango-django.mdx. */}
           <ScrollReveal>
             <ProjectTile projectSlug="laango-django" />
-          </ScrollReveal>
-
-          <ScrollReveal>
-            <ProjectTile projectSlug="apre-method" />
           </ScrollReveal>
         </div>
       </div>
