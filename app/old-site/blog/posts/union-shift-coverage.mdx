@@ -1,0 +1,20 @@
+---
+title: 'Union Shift Coverage'
+publishedAt: '2026-08-18'
+summary: 'A Django app that automates finding shift coverage by cascading in-app notifications down a seniority list until someone accepts.'
+---
+
+[**GitHub Link**](https://github.com/dianestephani/union-shift-coverage)
+<br />
+
+## **Overview**
+Union Shift Coverage helps a team find coverage for a shift without anyone having to call or text down a list. An employee signs in with their Google account, posts a shift they need covered, and the app works its way down the seniority list — sending a real-time, in-app notification to one person at a time — until someone accepts. There's no texting, email, or push notification service involved yet; everything happens inside the app itself, which most employees reach through their phone's browser.
+<br />
+
+## **How It Works**
+This is a server-rendered Django app rather than a separate API + React frontend — Django's own templating and ORM take the place of Express and Mongoose. Three pieces drive the whole system: every person is an `Employee` row with a `seniority_rank`, and a coverage request cascades to the *next* person down that list rather than blasting everyone at once; a small state machine in `coverage_service.py` (`DRAFT` → `SEARCHING` → `COVERED`/`UNCOVERED`, or `CANCELLED` at any point before it resolves) owns every transition and writes an immutable `CoverageEvent` row for each one, so any request's full history is auditable; and notifications are pushed live over a WebSocket via Django Channels — the moment a `Notification` row is created server-side, it's pushed straight to every open tab for that employee, no polling. A manager role (just an `Employee` with `is_manager=True`) unlocks a dashboard of every open request, the full roster, and any employee's request/response history. Auth is Google OAuth via `django-allauth`, gated so a login only succeeds if it matches a pre-provisioned employee email. The app ships with 182 tests across models, forms, views, the state machine, auth linking, admin, and the WebSocket consumer itself.
+<br />
+
+## **Why I Built It / How I Use It**
+I built this because calling or texting down a seniority list to find coverage is genuinely annoying — it's slow, it's manual, and it means someone's stuck staring at a roster typing out the same message to person after person until someone answers. This app takes that whole process off a person's plate: post the shift once, and the app handles working down the list itself. It also gave me a reason to go deeper into Django than my previous Django project did — moving past request/response CRUD into Django Channels and WebSockets for real, no-polling real-time delivery, plus a proper state machine and audit trail instead of just flipping status fields. The next step is adding actual push notifications, so a person finds out they've got a new request without needing the app open in a browser tab.
+<br />

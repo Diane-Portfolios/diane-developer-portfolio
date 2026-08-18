@@ -90,12 +90,12 @@ describe('ProjectsSection composition', () => {
     const slugs = tiles.map((tile) => tile.props.projectSlug)
 
     expect(slugs).toEqual([
-      'wonderbot-1000',
-      'playswapmeat',
+      'union-shift-coverage',
       'house-ops',
+      'wonderbot-1000',
       'moonbob-money',
+      'playswapmeat',
       'laango-django',
-      'apre-method',
     ])
   })
 
