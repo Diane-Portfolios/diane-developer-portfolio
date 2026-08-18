@@ -35,8 +35,8 @@ const FLIPPED_TEAM_POKEMON = new Set(['ceruledge', 'annihilape', 'basculegion-fe
 const OPPONENT_POKEMON = [
   'charizard',
   'milotic',
-  'scovillain',
-  'dragapult',
+  'archaludon',
+  'serperior',
   'skeledirge',
   'garchomp',
 ]
