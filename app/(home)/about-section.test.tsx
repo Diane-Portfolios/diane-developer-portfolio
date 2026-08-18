@@ -178,8 +178,8 @@ describe('AboutSection', () => {
     expect(sprites.map((img) => img.getAttribute('src'))).toEqual([
       'https://example.com/sprites/charizard.png',
       'https://example.com/sprites/milotic.png',
-      'https://example.com/sprites/scovillain.png',
-      'https://example.com/sprites/dragapult.png',
+      'https://example.com/sprites/archaludon.png',
+      'https://example.com/sprites/serperior.png',
       'https://example.com/sprites/skeledirge.png',
       'https://example.com/sprites/garchomp.png',
     ])
